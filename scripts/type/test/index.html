@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example Test Index</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- start test module files -->
+    <link rel="stylesheet" type="text/css" href="../TruJS.test/resources/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../TruJS.test/resources/css/default.css" />
+    <script src="../TruJS.test/app.js"></script>
+    <!-- end test module files -->
+
+    <!-- start file to test -->
+    <script src="{:moduleFile:}"></script>
+    <script src="{:testFile:}"></script>
+    <!-- end file to test -->
+</head>
+<body>
+    <script>
+        TruJSTest(".testPackage").setup("module").value({:moduleName:});
+    </script>
+    <script src="../TruJS.test/browser-run.js"></script>
+</body>
+</html>

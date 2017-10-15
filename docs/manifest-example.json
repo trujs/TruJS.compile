@@ -1,0 +1,75 @@
+/*
+   The base path is where ever the processed ".man" file resides. All file paths that don't start
+   with "/" will start at the base path.
+
+   The manifest is a json file with a single array at the root. In the array are manifest entry
+   objects. Each manifest entry object requires a `type` which determines how the files are
+   gathered and processed.
+*/
+[{
+	"type": "module", /* a type of "module" uses the module format to determine the files that will be combined. Files will be treated the same as the "javascript" type */
+
+	"name": "my-project",
+	"version": "1.0.0",
+	"copyright": true, /* adds a copy write notice to the begining of the combined file */
+
+	"module": "module.js", /* default. The file that deines which modules are required. */
+	"hints": { /* hints projvide a physical path to where the system might find the file */
+		"TruJS": "{repo}/TruJS", /* {repo} is a special value representing the root repo directory */
+		"MyProj": "{projets}/my-project" /* {projects} is as special value representing the projects directory */
+	},
+
+	"strict": true, /* default. If true, adds the strict anotation */
+
+	"minify": true, /* default. If true or a string name, the combined file will be minified */
+	"lint": true, /* default. If true, each file will be linted, and then the combined file will be linted */
+
+	"format": "browser", /* default. The output will be wrapped in an iife */
+	"return": "module", /* default for module type. The object name within the iife that will be returned from the iife */
+
+	"output": "./dist" /* default. the directory to which the combined file will be saved */
+
+}, {
+	"type": "javascript", /* all files are combined, using the path and file name as the JavaScript namespace and property name respectively */
+
+	"name": "my-other-project",
+	"version": "1.0.0",
+	"description": "",
+	"copyright": "",
+
+	"files": [
+		"./path/*", /* adds all files in the "path" directory to the combine list, no recursion */
+		"-./path/no-include.s", /* the minus sign prefix removes the file if it was added */
+		"./path/add-last.js", /* a file explicitly added will appear in the order it was added, regarless if it was added in a wildcard entry */
+		"+./other/path", /* the plus sign prefix adds all files in the directory recursively */
+ 	],
+	"include": [
+		"my-project" /* includes the files from the manifest entry referenced by name */
+	],
+
+	"strict": true, /* default. If true, adds the strict anotation */
+	"lint": true, /* default. If true, each file will be linted, and then the combined file will be linted */
+
+	"minify": true, /* default. If true or a string name, the combined file will be minified */
+	"format": "node", /* For a `node` format, the output file will be index.js within a directory named using the manifest name */
+	"return": "myObject", /* For a node format, the object/function variable that will be exported */
+
+	"output": "../build" /* the directory to which the combined file will be saved */
+}, {
+	"type": "files", /* the files are gathered and sent to the output without processing */
+
+	"name": "my-files-project",
+	"description": "",
+	"copyright": "",
+
+	"files": [
+		"./index.html",
+		"+./css",
+		"+./images"
+	],
+	"include": [
+		"my-project" /* if the include entry is for a `module` or `javascript` type, the combined files will be added, not the preprocessed file list */
+	],
+
+	"output": "./dist"
+}]

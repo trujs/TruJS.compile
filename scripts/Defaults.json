@@ -1,0 +1,72 @@
+{
+  "all": {
+    "fileTypes": [],
+    "format": "browser"
+  },
+  "node": {
+    "minify": false,
+    "strict": true,
+    "lint": false,
+    "global": "global"
+  },
+  "browser": {
+    "minify": true,
+    "strict": true,
+    "lint": false,
+    "global": "window"
+  },
+  "none": {
+    "minify": false,
+    "strict": true,
+    "lint": false
+  },
+  "module": {
+    "return": "$$container$$"
+  },
+  "testFile": "test.json",
+  "testType": "test",
+  "test": {
+    "strict": false,
+    "naming": false,
+    "lint": false
+  },
+  "iocPaths": [
+    "{repos}/TruJS/TruJS.js",
+    "{repos}/TruJS/_Object.js",
+    "{repos}/TruJS/func/_Inspector.js",
+    "{repos}/TruJS/ioc/_Entry.js",
+    "{repos}/TruJS/ioc/_Container.js",
+    "{repos}/TruJS/ioc/Container.js"
+  ],
+  "minifier": {
+    "extentionMap": {
+      ".js": "javascript"
+      , ".css": "css"
+      , ".html": "html"
+    }
+    , "javascript": {
+      "mangle": false
+    }
+  },
+  "manifest": {
+    "manifestFile": "manifest.json"
+    , "manifestDir": "{script}/manifest.json"
+  },
+  "scriptsDir": "scripts",
+  "fileTypes": {
+    ".html": "Html",
+    ".css": "Css",
+    ".json": "Json",
+    ".xml": "Xml",
+    ".txt": "Txt"
+},
+  "encoding": {
+      ".js": "utf8",
+      ".css": "utf8",
+      ".html": "utf8",
+      ".json": "utf8",
+      ".txt": "utf8",
+      ".sass": "utf8",
+      ".xml": "utf8"
+  }
+}

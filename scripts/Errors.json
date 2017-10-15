@@ -1,0 +1,15 @@
+{
+  "moduleFileNotFound": "[ModuleFileNotFound] The module.json file was not found at \"{path}\"."
+  , "missingReturn": "[MissingReturn] There must be a return value in the manifest entry for node formatting."
+  , "missingCollector": "[MissingCollector] The collector for type \"{type}\" does not exist."
+  , "missingInclude": "[MissingInclude] There isn't a manifest entry named \"{include}\"."
+  , "missingSaver": "[MissingSaver] The saver for type \"{type}\" does not exist. A Saver is required when the \"output\" parameter is used."
+  , "missingHint": "[MissingHint] Unable to find the hint for object \"{path}\"."
+  , "invalidModuleEntry": "[InvalidModuleEntry] The module entry \"{entry}\" could not be found in the file system starting at \"{path}\"."
+  , "missingMinifierModule": "[MissingMinifierModule] There isn't a module for the \"{ext}\" extension."
+  , "minificationError": "[MinificationError] {:message:} @line: {:line:} @col: {:col:}."
+  , "missingTestTitle": "[MissingTestTitleOrLabel] The test object requires a title or label."
+  , "fileMissing": "[FileMissing] The file \"{path}\" does not exist."
+  , "moduleEntryMismatch": "[ModuleEntryMismatch] The module entry types, at \"{key}\", to be merged are not of the same type."
+  , "missingFileProperty": "[MissingFileProperty] The file object is missing the \"file\" property."
+}

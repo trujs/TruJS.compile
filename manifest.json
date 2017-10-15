@@ -1,0 +1,46 @@
+[{
+    "type": "module"
+    , "name": "TruJS.compile"
+    , "version": "0.0.1"
+    , "description": "The assembler/compiler for TruJS projects"
+
+    , "hints": {
+      "TruJS": "{repos}/TruJS"
+    }
+
+    , "format": "node"
+
+    , "output": "./build/{name}/index.js"
+
+    , "package": {
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/trujs/TruJS.compile.git"
+        },
+        "author": "Rodger McIntosh",
+        "license": "MIT",
+        "bugs": {
+          "url": "https://github.com/trujs/TruJS.compile/issues"
+        },
+        "homepage": "https://github.com/trujs/TruJS.compile#readme"
+    }
+}, {
+  "type": "javascript"
+  , "name": "TruJS.compile"
+  , "version": "0.0.1"
+  , "description": "The TruJS.compile command line untility"
+
+  , "files": [
+    "../cli.js"
+  ]
+
+  , "format": "none"
+
+  , "output": "./build/{name}/cli.js"
+}, {
+  "type": "test"
+  , "name": "TruJS.compile"
+  , "description": "The test package for node"
+
+  , "output": "./build/{name}.test/test.json"
+}]
