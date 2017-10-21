@@ -15,7 +15,6 @@ function _TestPostProcessor(promise, type_test_testIndex, stringApply, nodePath,
                 , path = "index.html"
                 , file = fileObj(path, data)
                 ;
-
                 files.push(file);
             }
 

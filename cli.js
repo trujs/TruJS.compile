@@ -4,7 +4,7 @@
 * @module TruJS.compile.cli
 */
 //load the required modules
-var cmdArgs = require('TruJS.cmdArgs')(process.argv)
+var cmdArgs = require('trujs-cmdargs')(process.argv)
 , compile = require('./index.js')
 //resolve the compiler worker from the compile container
 , run = compile('.run')

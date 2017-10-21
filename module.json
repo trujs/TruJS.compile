@@ -71,12 +71,14 @@
         , "test": ["TruJS.compile.collector._TestCollector", []]
         , "sass": ["TruJS.compile.collector._SassCollector", []]
         , "routing": ["TruJS.compile.collector._RoutingCollector", []]
+        , "view": ["TruJS.compile.collector._ViewCollector", []]
     }]
     , "preProcessor": [{
         "javascript": ["TruJS.compile.preProcessor._JavaScriptPreProcessor", []]
         , "module": ["TruJS.compile.preProcessor._ModulePreProcessor", []]
         , "test": ["TruJS.compile.preProcessor._TestPreProcessor", []]
         , "routing": ["TruJS.compile.preProcessor._RoutingPreprocessor", []]
+        , "view": ["TruJS.compile.preProcessor._ViewPreProcessor", []]
     }]
     , "assembler": [{
         "javascript": ["TruJS.compile.assembler._JavaScriptAssembler", []]
@@ -84,12 +86,14 @@
         , "test": ["TruJS.compile.assembler._TestAssembler", []]
         , "sass": ["TruJS.compile.assembler._SassAssembler", []]
         , "routing": ["TruJS.compile.assembler._JavaScriptAssembler", []]
+        , "view": ["TruJS.compile.assembler._JavaScriptAssembler", []]
     }]
     , "formatter": [{
         "javascript": ["TruJS.compile.formatter._JavaScriptFormatter", []]
         , "module": ["TruJS.compile.formatter._JavaScriptFormatter", []]
         , "test": ["TruJS.compile.formatter._TestFormatter", []]
         , "routing": ["TruJS.compile.formatter._JavaScriptFormatter", []]
+        , "view": ["TruJS.compile.formatter._JavaScriptFormatter", []]
     }]
     , "postProcessor": [{
         "javascript": ["TruJS.compile.postProcessor._JavaScriptPostProcessor", []]
@@ -97,6 +101,7 @@
         , "sass": ["TruJS.compile.postProcessor._SassPostProcessor", []]
         , "routing": ["TruJS.compile.postProcessor._JavaScriptPostProcessor", []]
         , "test": ["TruJS.compile.postProcessor._TestPostProcessor", []]
+        , "view": ["TruJS.compile.postProcessor._JavaScriptPostProcessor", []]
     }]
     , "fileSaver": ["TruJS.compile._FilesSaver", []]
     , "saver": ["TruJS.compile._Saver", []]
