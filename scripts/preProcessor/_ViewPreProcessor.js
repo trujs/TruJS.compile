@@ -3,10 +3,13 @@
 * @factory
 */
 function _ViewPreProcessor(promise, namer, fileObj) {
-    var STATE_PATT = /[.]state[.]json$/
+    var STATE_PATT = /([.]|^)state[.]json$/
+    , TRIM_DOT_PATT = /^[.]+(.*)$/
     , cnsts = {
         "stateEntry": "$state"
         , "stateName": "$State"
+        , "views": "views"
+        , "state": "state"
     };
 
     /**
@@ -19,15 +22,15 @@ function _ViewPreProcessor(promise, namer, fileObj) {
         try {
             var state = extractState(entry, files)
             , data = JSON.stringify(state)
-            , naming = { "namespace": entry.name, "name": cnsts.stateName }
+            , naming = { "namespace": entry.name, "name": entry.stateName || cnsts.stateName }
             ;
 
             data = "/**[@naming(" + JSON.stringify(naming) + ")]*/\n" + data;
 
-            files.push(fileObj(cnsts.stateName, data));
+            files.push(fileObj(entry.stateName || cnsts.stateName, data));
 
-            entry.module[cnsts.stateEntry] =
-                [ entry.name + "." + cnsts.stateName, [], false];
+            entry.module[entry.stateEntry || cnsts.stateEntry] =
+                [ entry.name + "." + entry.stateName || cnsts.stateName, [], false];
 
             resolve(files);
         }
@@ -48,24 +51,45 @@ function _ViewPreProcessor(promise, namer, fileObj) {
                 , naming = namer(entry.root, fileObj)
                 , namespace = naming.namespace
                     .replace(entry.name, "")
+                    .replace(TRIM_DOT_PATT, "$1")
                 , name = naming.name
                     .replace(naming.namespace + ".", "")
-                    .replace(".state", "")
+                    .replace(cnsts.state, "")
+                    .toLowerCase()
                 , segs = namespace.split(".")
                 , parent = state
                 ;
 
                 //ensure the parent exists
-                for (var i = 0, l = segs.length; i < l; i++) {
-                    if (!!segs[i]) {
-                        if (!parent.hasOwnProperty(segs[i])) {
-                            parent[segs[i]] = {};
+                if (!!namespace) {
+                    //loop through the namespace segments
+                    for (var i = 0, l = segs.length, e = l - 1; i < l; i++) {
+                        segs[i] = segs[i].toLowerCase();
+                        //skip anything that starts with views
+                        if (i > 0 || segs[i] !== (entry.views || cnsts.views)) {
+                            //if there wasn't a file name, and i is the last position
+                            if (!name && i === e) {
+                                name = segs[i];
+                                break;
+                            }
+                            if (!parent.hasOwnProperty(segs[i])) {
+                                parent[segs[i]] = {};
+                            }
+                            parent = parent[segs[i]];
                         }
-                        parent = parent[segs[i]];
                     }
                 }
 
-                parent[name] = obj;
+                if (!name) {
+                    name = cnsts.state;
+                }
+
+                if (name === cnsts.state) {
+                    apply(obj, state);
+                }
+                else {
+                    parent[name] = obj;
+                }
 
                 indxs.push(indx);
             }

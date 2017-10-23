@@ -9,31 +9,37 @@ function testviewPreProcessor(arrange, act, assert, module) {
             , "module": []
         };
         files = [{
-            "dir": "TruJS.example"
-            , "file": "main.state.json"
-            , "name": "main.state"
+            "dir": "TruJS.example.views"
+            , "file": "state.json"
+            , "name": "state"
+            , "ext": ".json"
+            , "data": "{\"name\":\"state\"}"
+        }, {
+            "dir": "TruJS.example.views.main"
+            , "file": "state.json"
+            , "name": "state"
             , "ext": ".json"
             , "data": "{\"name\":\"main\"}"
         }, {
-            "dir": "TruJS.example.views"
-            , "file": "toolbar.state.json"
-            , "name": "toolbar.state"
+            "dir": "TruJS.example.views.main.toolbar"
+            , "file": "state.json"
+            , "name": "state"
             , "ext": ".json"
             , "data": "{\"name\":\"toolbar\"}"
         }, {
-            "dir": "TruJS.example.views"
-            , "file": "header.state.json"
-            , "name": "header.state"
+            "dir": "TruJS.example.views.main.header"
+            , "file": "state.json"
+            , "name": "state"
             , "ext": ".json"
             , "data": "{\"name\":\"header\"}"
         }, {
             "dir": "TruJS.example.views.users"
-            , "file": "user.state.json"
-            , "name": "user.state"
+            , "file": "state.json"
+            , "name": "state"
             , "ext": ".json"
             , "data": "{\"name\":\"user\"}"
         }, {
-            "dir": "TruJS.example.view.user"
+            "dir": "TruJS.example.view.users"
             , "file": "user.json"
             , "name": "user"
             , "ext": ".json"
@@ -63,7 +69,7 @@ function testviewPreProcessor(arrange, act, assert, module) {
 
         test("files[1].data should be")
         .value(files, "[1].data")
-        .equals("/**[@naming({\"namespace\":\"TruJS.example\",\"name\":\"$State\"})]*/\n{\"main\":{\"name\":\"main\"},\"views\":{\"toolbar\":{\"name\":\"toolbar\"},\"header\":{\"name\":\"header\"},\"users\":{\"user\":{\"name\":\"user\"}}}}");
+        .equals("/**[@naming({\"namespace\":\"TruJS.example\",\"name\":\"$State\"})]*/\n{\"name\":\"state\",\"main\":{\"name\":\"main\",\"toolbar\":{\"name\":\"toolbar\"},\"header\":{\"name\":\"header\"}},\"users\":{\"name\":\"user\"}}");
 
     });
 }
