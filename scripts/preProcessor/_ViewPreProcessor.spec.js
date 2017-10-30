@@ -1,50 +1,14 @@
 /**[@test({ "title": "TruJS.compile.preProcessor._ViewPreProcessor: " })]*/
-function testviewPreProcessor(arrange, act, assert, module) {
-    var viewPreProcessor, entry, files, err;
+function testviewPreProcessor(arrange, act, assert, callback, promise, module) {
+    var viewPreProcessor, type_view_createState, type_view_createView
+    , entry, files, err;
 
     arrange(function () {
-        viewPreProcessor = module(["TruJS.compile.preProcessor._ViewPreProcessor", []]);
-        entry = {
-            "name": "TruJS.example"
-            , "module": []
-        };
-        files = [{
-            "dir": "TruJS.example.views"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"state\"}"
-        }, {
-            "dir": "TruJS.example.views.main"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"main\"}"
-        }, {
-            "dir": "TruJS.example.views.main.toolbar"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"toolbar\"}"
-        }, {
-            "dir": "TruJS.example.views.main.header"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"header\"}"
-        }, {
-            "dir": "TruJS.example.views.users"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"user\"}"
-        }, {
-            "dir": "TruJS.example.view.users"
-            , "file": "user.json"
-            , "name": "user"
-            , "ext": ".json"
-            , "data": "{}"
-        }];
+        type_view_createState = callback(promise.resolve(files));
+        type_view_createView = callback(promise.resolve(files));
+        viewPreProcessor = module(["TruJS.compile.preProcessor._ViewPreProcessor", [, type_view_createState, type_view_createView]]);
+        entry = {};
+        files = [];
     });
 
     act(function (done) {
@@ -63,13 +27,13 @@ function testviewPreProcessor(arrange, act, assert, module) {
         .value(err)
         .isUndef();
 
-        test("files should have 2 members")
-        .value(files)
-        .hasMemberCountOf(2);
+        test("type_view_createState should be called once")
+        .value(type_view_createState)
+        .hasBeenCalled(1);
 
-        test("files[1].data should be")
-        .value(files, "[1].data")
-        .equals("/**[@naming({\"namespace\":\"TruJS.example\",\"name\":\"$State\"})]*/\n{\"name\":\"state\",\"main\":{\"name\":\"main\",\"toolbar\":{\"name\":\"toolbar\"},\"header\":{\"name\":\"header\"}},\"users\":{\"name\":\"user\"}}");
+        test("type_view_createState should be called with")
+        .value(type_view_createState)
+        .hasBeenCalledWith(0, [entry, files]);
 
     });
 }

@@ -62,6 +62,11 @@
         , "test": [{
             "testIndex": ["TruJS.compile.type.test.indexHtml", [], false]
         }]
+        , "view": [{
+            "createState": ["TruJS.compile.type.view._CreateState", []]
+            , "createView": ["TruJS.compile.type.view._CreateView", []]
+            , "processTemplate": ["TruJS.compile.type.view._ProcessTemplate", []]
+        }]
     }]
     , "collector": [{
         "collection": ["TruJS.compile.collector._CollectionCollector", []]

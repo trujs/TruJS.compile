@@ -78,6 +78,13 @@ function _PathProcessor(nodePath, pathParser) {
         pathObj.path = pathObj.dir = pathObj.dir.substring(0, pathObj.dir.indexOf("*"));
     }
 
+    //if this is recursive and no wildcard then make one
+    if (pathObj.options.recurse && !pathObj.wildcard && !!pathObj.base) {
+        pathObj.wildcard = pathObj.base;
+        pathObj.path = pathObj.dir;
+        pathObj.directory = true;
+    }
+
     return pathObj;
   }
 

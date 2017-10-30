@@ -7,11 +7,19 @@ function _ViewCollector(collector_module) {
     var defaults = {
       "files": [
         "+./*.state.json"
+        , "+./state.json"
+        , "+./*.view.html"
+        , "+./view.html"
+        , "+./*.view.css"
+        , "+./view.css"
+        , "+./*.view.js"
+        , "+./view.js"
       ]
       , "baseModule": ["{repos}/TruJS.simpleViewSystem"]
       , "hints": {
           "TruJS.simpleViewSystem": "{repos}/TruJS.simpleViewSystem/scripts"
           , "TruJS": "{repos}/TruJS"
+          , "TruJS.Comp": "{repos}/TruJS.Comp"
       }
       , "module": {}
     };

@@ -72,6 +72,31 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
 
   }
   /**
+  * Merges the output path with the entry
+  * @function
+  */
+  function updateOutputPath(resolve, reject, manifest, manifestFiles) {
+      try {
+          //loop through each manifest entry
+          manifest.forEach(function forEachEntry(entry, indx) {
+            //update special values in the output path
+            if (!!entry.output && typeof entry.output === 'string') {
+
+              entry.output = entry.output
+              .replace(/{([^}]+)}/g, function(tag, key) {
+                  var ref = resolvePath(key, entry);
+                  return ref.value;
+              });
+            }
+          });
+
+          resolve(manifestFiles);
+      }
+      catch(ex) {
+          reject(ex);
+      }
+  }
+  /**
   * Runs the pre-processor, assembler, formattor, and the post-processor for
   *   all manifest entries
   * @function
@@ -163,6 +188,13 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
       return includes(manifest, manifestFiles);
     });
 
+    //update the output path
+    proc = proc.then(function (manifestFiles) {
+      return new promise(function (resolve, reject) {
+          updateOutputPath(resolve, reject, manifest, manifestFiles);
+      });
+    });
+
     //process the entries
     proc = proc.then(function (manifestFiles) {
       return new promise(function (resolve, reject) {
@@ -181,15 +213,8 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
       manifest.forEach(function forEachEntry(entry, indx) {
         //add the files to the entry
         entry.files = manifestFiles[indx];
-
-        //update special values in the output path
-        if (!!entry.output && typeof entry.output === 'string') {
-          entry.output = entry.output.replace("{name}", entry.name);
-          entry.output = entry.output.replace("{version}", entry.version);
-          entry.output = entry.output.replace("{format}", entry.format);
-        }
       });
-      return manifest;
+      return promise.resolve(manifest);
     });
 
   };
