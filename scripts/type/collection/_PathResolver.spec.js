@@ -60,7 +60,7 @@ function testPathResolver1(arrange, act, assert, callback, mock, module) {
       "./path/file.js",
       "./path/*",
       "./path/*.js",
-      "+./path/path2",
+      "+./path/path2/*",
       "-./path/*.html"
     ];
   });
@@ -106,6 +106,8 @@ function testPathResolver1(arrange, act, assert, callback, mock, module) {
     test("The pathResultProcessor should have been called 5 times")
       .value(pathResultProcessor.callbackCount)
       .equals(5);
+
+      //console.log(pathResultProcessor.getArgs(3)[1]);
 
     test("The results should have 9 members")
       .value(res)
