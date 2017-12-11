@@ -4,6 +4,9 @@
 * @factory
 */
 function _JavaScriptConverter() {
+  var cnsts = {
+      "image":["png","jpg","gif","jpeg","bmp"]
+  };
 
   /**
   * Modifies the file contents for non javascript files, wrapping the text in
@@ -18,14 +21,26 @@ function _JavaScriptConverter() {
 
     return data;
   }
+  /**
+  * Base 64 converts the data
+  * @function
+  */
+  function convertImage(type, data) {
+    return "\"data:image/" + type + ";base64," + (new Buffer(data).toString('base64')) + "\"";
+  }
 
   /**
   * @worker
   * @param {string} type The type of data, html, xml, etc...
   * @param {string} data The data that needs converting
   */
-  return function (type, data) {
-    //currently all types can be converted with one method
-    return convertNonJs(data);
+  return function JavaScriptConverter(type, data) {
+    //if the type is an image type
+    if (cnsts.image.indexOf(type) !== -1) {
+        return convertImage(data);
+    }
+    else {
+        return convertNonJs(data);
+    }
   };
 }
