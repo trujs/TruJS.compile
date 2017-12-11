@@ -18,8 +18,8 @@ function _ViewCollector(collector_module) {
       , "baseModule": ["{repos}/TruJS.simpleViewSystem"]
       , "hints": {
           "TruJS.simpleViewSystem": "{repos}/TruJS.simpleViewSystem/scripts"
+          , "TruJS.Comp": "{repos}/TruJS.Comp/scripts/views"
           , "TruJS": "{repos}/TruJS"
-          , "TruJS.Comp": "{repos}/TruJS.Comp"
       }
       , "module": {}
     };
@@ -30,7 +30,7 @@ function _ViewCollector(collector_module) {
     return function ViewCollector(base, entry) {
 
         //by default we'll add the TruJS base and all spec.js file recursively
-        entry = merge(entry, defaults);
+        entry = update(entry, defaults);
 
         //run the collection collector
         return collector_module(base, entry);

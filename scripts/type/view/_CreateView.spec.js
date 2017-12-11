@@ -1,45 +1,11 @@
 /**[@test({ "title": "TruJS.compile.type.view._CreateView: " })]*/
 function testCreateView(arrange, act, assert, callback, promise, module) {
-    var createView, templateFiles, type_view_processTemplate, entry, files, res
+    var createView, type_view_processTemplate, entry, files, res
     , err;
 
     arrange(function () {
-        templateFiles = [{
-            "file": "view.html"
-            , "name": "view"
-            , "ext": ".html"
-            , "dir": "/code/repos/TruJS/Comp/Table"
-            , "data": ""
-        }, {
-            "file": "view.css"
-            , "name": "view"
-            , "ext": ".css"
-            , "dir": "/code/repos/TruJS/Comp/Table"
-            , "data": ""
-        }, {
-            "file": "view.js"
-            , "name": "view"
-            , "ext": ".js"
-            , "dir": "/code/repos/TruJS/Comp/Table"
-            , "data": ""
-        }, {
-            "file": "view.html"
-            , "name": "view"
-            , "ext": ".html"
-            , "dir": "/code/repos/TruJS/Comp/Grid"
-            , "data": ""
-        }, {
-            "file": "view.js"
-            , "name": "view"
-            , "ext": ".js"
-            , "dir": "/code/repos/TruJS/Comp/Grid"
-            , "data": ""
-        }];
         type_view_processTemplate = callback(function() {
-            if (type_view_processTemplate.callbackCount === 1) {
-                return promise.resolve(templateFiles);
-            }
-            return promise.resolve([]);
+            return promise.resolve([{ "id": "id", "name": "name" }]);
         });
         createView = module(["TruJS.compile.type.view._CreateView", [,,, type_view_processTemplate]]);
         entry = {
@@ -83,14 +49,21 @@ function testCreateView(arrange, act, assert, callback, promise, module) {
         .value(err)
         .isUndef();
 
-        test("res should have 8 members")
+        test("res should have 2 properties")
         .value(res)
-        .hasMemberCountOf(8);
+        .hasPropertyCountOf(2);
 
-        test("entry.module should be")
-        .value(entry.module)
-        .stringify()
-        .equals("{\"templates\":[{\"proj\":[{\"toolbar\":[\"Proj.ToolBarHtml\",[],false]}],\"trujs\":[{\"comp\":[{\"table\":[\"TruJS.Comp.TableHtml\",[],false],\"grid\":[\"TruJS.Comp.GridHtml\",[],false]}]}]}],\"styles\":[{\"proj\":[{\"toolbar\":[\"Proj.ToolBarCss\",[],false]}],\"trujs\":[{\"comp\":[{\"table\":[\"TruJS.Comp.TableCss\",[],false]}]}]}],\"controllers\":[{\"proj\":[{\"toolbar\":[\"Proj.ToolBar\",[[\".templates.proj.toolbar\"],[\".styles.proj.toolbar\"]]]}],\"trujs\":[{\"comp\":[{\"table\":[\"TruJS.Comp.Table\",[[\".templates.trujs.comp.table\"],[\".styles.trujs.comp.table\"]]],\"grid\":[\"TruJS.Comp.Grid\",[[\".templates.trujs.comp.grid\"],[\".styles.trujs.comp.grid\"]]]}]}]}]}");
+        test("res should have a property of")
+        .value(res)
+        .hasProperty("$idRef");
+
+        test("res.$idRef should have a property")
+        .value(res, "$idRef")
+        .hasProperty("Proj.views.ToolBar.id");
+
+        test("res should have a property of")
+        .value(res)
+        .hasProperty("Proj.views.ToolBar");
 
     });
 }
