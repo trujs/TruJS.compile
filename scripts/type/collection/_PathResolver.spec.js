@@ -82,7 +82,7 @@ function testPathResolver1(arrange, act, assert, callback, mock, module) {
 
     test("The dirProcessor should be called 3 times")
       .value(dirProcessor)
-      .hasBeenCalled(3);
+      .hasBeenCalled(4);
 
     test("The 1st call to the dirProcessor should have a path of")
       .run(dirProcessor.getArgs, [0])
@@ -99,6 +99,12 @@ function testPathResolver1(arrange, act, assert, callback, mock, module) {
       .value("{value}", "[0].path")
       .matches(/[/\\]base[/\\]path[/\\]path2/);
 
+      test("The 3rd call to the dirProcessor should have a path of")
+        .run(dirProcessor.getArgs, [3])
+        .value("{value}", "[0]")
+        .stringify()
+        .equals("{\"root\":\"Z:\\\\\",\"dir\":\"Z:\\\\base\\\\path\",\"base\":\"*.html\",\"ext\":\".html\",\"name\":\"*\",\"path\":\"Z:\\\\base\\\\path\",\"options\":{\"recurse\":false,\"filter\":\".html\"},\"minus\":true,\"directory\":true,\"wildcard\":\"*.html\"}");
+
     test("The pathProcessor should be called 5 times")
       .value(pathProcessor.callbackCount)
       .equals(5);
@@ -106,8 +112,6 @@ function testPathResolver1(arrange, act, assert, callback, mock, module) {
     test("The pathResultProcessor should have been called 5 times")
       .value(pathResultProcessor.callbackCount)
       .equals(5);
-
-      //console.log(pathResultProcessor.getArgs(3)[1]);
 
     test("The results should have 9 members")
       .value(res)

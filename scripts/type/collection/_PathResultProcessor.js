@@ -191,8 +191,11 @@ function _PathResultProcessor(nodePath, regExGetMatches, stringTrim) {
       else if (result.missing) {
         procFiles.push({ "path": result.path, "missing": true });
       }
-      else {
+      else if (!!result.files){
         filterFiles(procFiles, result, matcher);
+      }
+      else if (missingFile(files, result.path)) {
+        procFiles.push({ "path": result.path, "fragment": result.fragment, "root": result.root, "dir": result.dir, "file": result.base, "name": result.name, "ext": result.ext });
       }
     }
     //if not an object then we are expecting a path string
