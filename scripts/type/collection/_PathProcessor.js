@@ -6,7 +6,8 @@ function _PathProcessor(nodePath, pathParser) {
   var cnsts = {
     "minus": "-"
     , "plus": "+"
-  };
+  }
+  , SEP_PATT = /[\/\\]/g;
 
   /**
   * Inspects the path to see what it is and returns an object describing it
@@ -14,7 +15,7 @@ function _PathProcessor(nodePath, pathParser) {
   */
   function processPath(base, curPath) {
     //get the first character to see if it's + or -
-    var fch = curPath[0], pathObj;
+    var fch = curPath[0], pathObj, segs;
 
     //modify the path if it had a + or -
     if (fch === cnsts.minus || fch === cnsts.plus) {
@@ -67,6 +68,28 @@ function _PathProcessor(nodePath, pathParser) {
       else if (pathObj.minus) {
         pathObj.wildcard = "*";
       }
+    }
+
+    //if there is a + somewhere in the path then we're going to capture the fragment
+    if (pathObj.dir.indexOf("+") !== -1) {
+        segs = pathObj.dir.split(SEP_PATT);
+        segs.every(function everySeg(seg, indx) {
+            if (seg.indexOf("+") === 0) {
+                segs[indx] = segs[indx].substring(1);
+                pathObj.fragment = segs.slice(indx).join("/");
+                pathObj.dir = segs.slice(0, indx).join("/");
+                if (pathObj.directory) {
+                    pathObj.options.recurse = true;
+                }
+                else {
+                    segs.push(pathObj.base);
+                    pathObj.path = segs.join("/");
+                }
+                return false;
+            }
+            return true;
+        });
+
     }
 
     //if there is a wildcard in the dir we need to get the base and record the

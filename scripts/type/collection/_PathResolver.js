@@ -46,17 +46,13 @@ function _PathResolver(promise, type_collection_pathProcessor, type_collection_p
       //get the path details
       var pathObj = type_collection_pathProcessor(base, curPath);
 
-      //if its a minus then resolve a promise with the object
-      if (pathObj.minus) {
-        return pathObj;
-      }
       //if the pathObj is a directory then list it
-      else if (pathObj.directory) {
+      if (pathObj.directory) {
         return type_collection_dirProcessor(pathObj);
       }
       //otherwise resolve a promise with the path
       else {
-        return pathObj.path;
+        return pathObj;
       }
     });
   }
