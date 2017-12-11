@@ -1,58 +1,43 @@
-/**[@test({ "title": "TruJS.compile.type.view._CreateState: "})]*/
+/**[@test({ "title": "TruJS.compile.type.view._CreateState:" })]*/
 function testCreateState(arrange, act, assert, module) {
-    var createState, entry, files, err;
+    var createState, entry, files, views, err;
 
     arrange(function () {
         createState = module(["TruJS.compile.type.view._CreateState", []]);
         entry = {
-            "name": "TruJS.example"
-            , "module": []
+            "name": "MyProj"
+            , "module": {}
         };
-        files = [{
-            "dir": "TruJS.example.views"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"state\"}"
-        }, {
-            "dir": "TruJS.example.views.main"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"main\"}"
-        }, {
-            "dir": "TruJS.example.views.main.toolbar"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"toolbar\"}"
-        }, {
-            "dir": "TruJS.example.views.main.header"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"header\"}"
-        }, {
-            "dir": "TruJS.example.views.users"
-            , "file": "state.json"
-            , "name": "state"
-            , "ext": ".json"
-            , "data": "{\"name\":\"user\"}"
-        }, {
-            "dir": "TruJS.example.view.users"
-            , "file": "user.json"
-            , "name": "user"
-            , "ext": ".json"
-            , "data": "{}"
-        }];
+        files = [];
+        views = {
+            "$idRef": {
+                "MyProj.views.Widget.form1": {
+                    "type": "TruJS.Comp.Form"
+                }
+             }
+            , "MyProj.views.Widget": {
+                "state": "{ \"name\": \"widget\" }"
+            }
+            , "TruJS.Comp.Layout.Row": {
+                "state": "{ \"name\": \"row\" }"
+                , "default": "{ \"name\": \"defaultrow\" }"
+            }
+            , "MyProj.views.Widget.form1": {
+                "state": "{ \"name\": \"form1\", \"subtitle\": \"SubForm\"}"
+            }
+            , "TruJS.Comp.Form": {
+                "default": "{ \"name\": \"defaultform\", \"title\": \"Form\" }"
+            }
+        };
     });
 
     act(function (done) {
-        createState(entry, files)
+        createState(entry, files, views)
         .then(function () {
             done();
         })
         .catch(function (error) {
+            err = error;
             done();
         });
     });
@@ -62,13 +47,17 @@ function testCreateState(arrange, act, assert, module) {
         .value(err)
         .isUndef();
 
-        test("files should have 2 members")
-        .value(files)
-        .hasMemberCountOf(2);
+        test("module should have 1 property")
+        .value(entry.module)
+        .hasPropertyCountOf(1);
 
-        test("files[1].data should be")
-        .value(files, "[1].data")
-        .equals("/**[@naming({\"namespace\":\"TruJS.example\",\"name\":\"$State\"})]*/\n{\"name\":\"state\",\"main\":{\"name\":\"main\",\"toolbar\":{\"name\":\"toolbar\"},\"header\":{\"name\":\"header\"}},\"users\":{\"name\":\"user\"}}");
+        test("files should have 1 member")
+        .value(files)
+        .hasMemberCountOf(1);
+
+        test("files 1st member should be")
+        .value(files, "[0].data")
+        .equals("{\"Widget\":{\"name\":\"widget\",\"form1\":{\"name\":\"form1\",\"subtitle\":\"SubForm\",\"title\":\"Form\"}},\"TruJS\":{\"Comp\":{\"Layout\":{\"Row\":{\"name\":\"row\"}}}}}");
 
     });
 }
