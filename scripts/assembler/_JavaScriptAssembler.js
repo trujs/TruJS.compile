@@ -64,7 +64,7 @@ function _JavaScriptAssembler(promise, annotation, nodePath, stringTrim, getLine
   * @function
   */
   function processFileData(entry, fileObj, namespaces) {
-    var naming = namer(entry.root, fileObj)
+    var naming = namer(entry.root, fileObj, entry.scripts)
     , fileData = fileObj.data
     , matcher;
 
