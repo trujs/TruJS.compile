@@ -17,7 +17,7 @@ function _Namer(annotation, stringTrim, defaults, nodePath) {
   * object and extracts the namespace. Returns the naming object
   * @function
   */
-  function nameFile(defaultRoot, fileObj) {
+  function nameFile(defaultRoot, fileObj, scriptsDir) {
     //get the file data and trim leading and trailing line breaks
     var data = stringTrim(fileObj.data, "\\r?\\n")
     , naming = annotation.lookup("naming", data) || {} //get the naming annotation, default empty obj
@@ -31,7 +31,7 @@ function _Namer(annotation, stringTrim, defaults, nodePath) {
       naming.name = naming.name || determineName(fileObj);
 
       //extract the namespace from the base directory
-      naming.namespace = naming.namespace || extractNamespace(fileObj, root);
+      naming.namespace = naming.namespace || extractNamespace(fileObj, root, scriptsDir);
 
       //if the name starts with - then remove it, that's a special convention
       //for namespacing
@@ -55,7 +55,7 @@ function _Namer(annotation, stringTrim, defaults, nodePath) {
   * Gets the namespace from the file path base
   * @function
   */
-  function extractNamespace(fileObj, root) {
+  function extractNamespace(fileObj, root, scriptsDir) {
     var found
     , dir = !!fileObj.fragment && nodePath.join(fileObj.dir, fileObj.fragment) || fileObj.dir
     , namespace = dir.split(SPLIT_PATT)
@@ -83,7 +83,7 @@ function _Namer(annotation, stringTrim, defaults, nodePath) {
     ;
 
     //since "scripts" is a special directory naming convention lets remove it
-    namespace = namespace.replace(/[.]scripts([.]|$)/, "$1");
+    namespace = namespace.replace(new RegExp("[.](?:" + (scriptsDir + "|" + defaults.scriptsDir) + ")([.]|$)"), "$1");
 
     //remove additional dots from the join
     namespace = stringTrim(namespace, "[.]");
@@ -107,7 +107,7 @@ function _Namer(annotation, stringTrim, defaults, nodePath) {
   /**
   * @worker
   */
-  return function Namer(root, fileObj) {
-    return nameFile(root, fileObj);
+  return function Namer(root, fileObj, scriptsDir) {
+    return nameFile(root, fileObj, scriptsDir);
   }
 }
