@@ -61,6 +61,9 @@ function _JavaScriptPreProcessor(promise, annotation, defaults, type_javascript_
     if (cnsts.jsExt.indexOf(fileObj.ext) === -1 ) {
       data = type_javascript_javaScriptConverter(fileObj.ext.substring(1), data);
     }
+    else if (isEmpty(data)) {
+        data = "\"\"";
+    }
 
     //see if we are going to perform the linting
     if (entry.lint === true || entry.lint === "pre") {
