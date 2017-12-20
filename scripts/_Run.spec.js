@@ -3,14 +3,14 @@ function testRun1(arrange, act, assert, callback, promise, module) {
   var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, res, manifestPath;
 
   arrange(function () {
-    data = "{ \"name\": \"value\" }";
+    data = "[{ \"name\": \"value\" }]";
     nodeFs = {
       "readFile": callback(function (path, b, cb) {
         cb(null, data);
       })
     };
     nodePath = module(".nodePath");
-    compiler = callback(function (settings) {
+    compiler = callback(function (basePath, settings) {
       return promise.resolve(settings);
     });
     defaults = {
@@ -58,7 +58,7 @@ function testRun1(arrange, act, assert, callback, promise, module) {
 
     test("The compiler callback 2nd arg should have a property \"name\"")
       .run(compiler.getArgs, [0])
-      .value("{value}", "[1]")
+      .value("{value}", "[1][0]")
       .hasProperty("name");
 
   });
@@ -69,7 +69,7 @@ function testRun2(arrange, act, assert, callback, promise, module) {
   var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, res, manifestPath;
 
   arrange(function () {
-    data = "{ \"name\": \"value\" }";
+    data = "[{ \"name\": \"value\" }]";
     nodeFs = {
       "readFile": callback(function (path, b, cb) {
         cb(null, data);
@@ -98,6 +98,7 @@ function testRun2(arrange, act, assert, callback, promise, module) {
         done();
       })
       .catch(function (err) {
+          console.log(err);
         res = err;
         done();
       });
@@ -158,7 +159,7 @@ function testRun4(arrange, act, assert, callback, module) {
   var defaults, data, nodeFs, compiler, run, cmdArgs, res, manifestPath;
 
   arrange(function () {
-    data = "{ \"name\": \"value\" ";
+    data = "[{ \"name\": \"value\" ";
     nodeFs = {
       "readFile": callback(function (path, b, cb) {
         cb(null, data);
@@ -197,7 +198,7 @@ function testRun5(arrange, act, assert, callback, module) {
   var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, cnt, nodeDirName, nodeProcess, manifestPaths, finished;
 
   arrange(function () {
-    data = "{ \"name\": \"value\" }";
+    data = "[{ \"name\": \"value\" }]";
     nodeFs = {
       "readFile": callback(function (path, b, cb) {
         cb(null, data);
@@ -267,7 +268,7 @@ function testRun6(arrange, act, assert, callback, module) {
   var data, nodeFs, nodePath, compiler, run, cmdArgs, res, manifestPath;
 
   arrange(function () {
-    data = "{ \"name\": \"value\" }";
+    data = "[{ \"name\": \"value\" }]";
     nodeFs = {
       "readFile": callback(function (path, b, cb) {
         cb(null, data);
@@ -357,6 +358,51 @@ function testRun7(arrange, act, assert, callback, promise, module) {
       .run(compiler.getArgs, [0])
       .value("{value}", "[1][1].name")
       .equals("entry4");
+
+  });
+}
+
+/**[@test({ "title": "TruJS.compile._Run: object with entries " })]*/
+function testRun7(arrange, act, assert, callback, promise, module) {
+  var defaults, manifest, nodeFs, compiler, run, cmdArgs, res;
+
+  arrange(function () {
+    manifest = "{ \"name\": \"entry1\", \"entries\": [{ },{ \"name\": \"entry2\" },{ \"name\": \"entry3\" },{ \"name\": \"entry4\" }]}";
+    nodeFs = {
+      "readFile": callback(function (path, b, cb) {
+        cb(null, manifest);
+      })
+    };
+    compiler = callback(function (basePath, manifest) {
+      return promise.resolve(manifest);
+    });
+    run = module(["TruJS.compile._Run", [, nodeFs, , compiler]]);
+    cmdArgs = {
+      "base": "/base"
+      , "manifest": "path1"
+    };
+  });
+
+  act(function (done) {
+    run(cmdArgs)
+      .then(function (results) {
+        res = results;
+        done();
+      })
+      .catch(function (err) {
+        res = err;
+        done();
+      });
+  });
+
+  assert(function (test) {
+      test("The 1st entry should have the parent name")
+      .value(res, "[0].name")
+      .equals("entry1");
+
+      test("The 2nd entry should have its own name")
+      .value(res, "[1].name")
+      .equals("entry2");
 
   });
 }

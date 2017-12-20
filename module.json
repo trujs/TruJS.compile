@@ -35,6 +35,10 @@
             , "pathProcessor": ["TruJS.compile.type.collection._PathProcessor", []]
             , "pathResultProcessor": ["TruJS.compile.type.collection._PathResultProcessor", []]
             , "pathResolver": ["TruJS.compile.type.collection._PathResolver", []]
+            , "gitDriver": [":require('simple-git')"]
+            , "repository": [{
+                "git": ["TruJS.compile.type.collection.repository._GitRepo", []]
+            }]
         }]
         , "javascript": [{
             "javaScriptConverter": ["TruJS.compile.type.javascript._JavaScriptConverter", []]
@@ -57,15 +61,16 @@
           , "routingErrors": ["TruJS.compile.type.route.RoutingErrors", [], false]
         }]
         , "sass": [{
-            "sassRender": [":require(\"node-sass\").render"]
+            "sassRender": [":require('node-sass').render"]
         }]
         , "test": [{
             "testIndex": ["TruJS.compile.type.test.indexHtml", [], false]
         }]
         , "view": [{
-            "createState": ["TruJS.compile.type.view._CreateState", []]
-            , "createView": ["TruJS.compile.type.view._CreateView", []]
+            "createView": ["TruJS.compile.type.view._CreateView", []]
             , "processTemplate": ["TruJS.compile.type.view._ProcessTemplate", []]
+            , "updateModule": ["TruJS.compile.type.view._UpdateModule", []]
+            , "createState": ["TruJS.compile.type.view._CreateState", []]
         }]
     }]
     , "collector": [{

@@ -60,7 +60,7 @@ function _RoutingPreProcessor(promise, preProcessor_module, type_route_server, a
     fileObj.file = fileObj.name + fileObj.ext;
 
     var route = annotation.lookup(cnsts.annotaionName, fileObj.data)
-    , naming = namer(entry.root, fileObj);
+    , naming = namer(entry.root, fileObj, entry.scripts);
 
     //only process if this has a route annotaion
     if (!!route) {

@@ -88,13 +88,33 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
 
     function parseData(data) {
       try {
-        settings.manifest = JSON.parse(data);
+        var manifest = JSON.parse(data);
+        settings.manifest = processManifest(manifest);
         resolve(settings);
       }
       catch(ex) {
         reject(ex);
       }
     }
+  }
+  /**
+  * Extracts the manifest entries and merges all other properties to each entry
+  * @function
+  */
+  function processManifest(manifest) {
+
+      if (!isArray(manifest)) {
+          var entries = manifest.entries;
+          delete manifest.entries;
+
+          entries.forEach(function forEachEntry(entry) {
+              update(entry, manifest);
+          });
+
+          return entries;
+      }
+
+      return manifest;
   }
   /**
   * Uses the entry setting to filter the manifest array

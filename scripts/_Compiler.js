@@ -10,14 +10,6 @@
 *   an array
 */
 function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
-  var cnsts = {
-    "collection": "collection"
-    , "collector": "collector"
-    , "preProcessor": "preProcessor"
-    , "assembler": "assembler"
-    , "formatter": "formatter"
-    , "postProcessor": "postProcessor"
-  };
 
   /**
   * Get the processing module by the entry `type` and process
@@ -25,7 +17,7 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
   */
   function getModule(entry, process) {
     //create the type string, using "collection" as the default entry type
-    var type = process + "." + (entry.type || cnsts.collection);
+    var type = process + "." + (entry.type || "collection");
     if (!$container.hasDependency(type)) {
       return;
     }
@@ -39,16 +31,32 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
   function collectFiles(resolve, reject, base, manifest) {
     //an array to store the collector promises
     var procs = []
+    , values = []
+    , exec;
 
     //if we passed then create the collect promise, otherwise we already rejected
     //loop through the manifest, run the collector for each
     if (manifest.every(everyEntry)) {
-      promise.all(procs)
-        .then(function (values) {
-          resolve(values);
+        //run each collector asyncronously because a collector could update
+        // repositories in the file system
+        procs.forEach(function forEachProc(proc, indx) {
+            if (!exec) {
+                exec = proc;
+            }
+            else {
+                exec = exec.then(function (files) {
+                    values.push(files);
+                    return proc;
+                });
+            }
+        });
+        //after all of the collectors finish
+        exec.then(function (results) {
+            values.push(results);
+            resolve(values);
         })
         .catch(function (err) {
-          reject(err);
+            reject(err);
         });
     }
 
@@ -133,10 +141,10 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
     var proc = promise.resolve(files)
 
     //get the modules for this entry
-    , preProcessor = getModule(entry, cnsts.preProcessor)
-    , assembler = getModule(entry, cnsts.assembler)
-    , formatter = getModule(entry, cnsts.formatter)
-    , postProcessor = getModule(entry, cnsts.postProcessor)
+    , preProcessor = getModule(entry, "preProcessor")
+    , assembler = getModule(entry, "assembler")
+    , formatter = getModule(entry, "formatter")
+    , postProcessor = getModule(entry, "postProcessor")
     ;
 
     //chain the pre processor

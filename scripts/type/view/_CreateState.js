@@ -19,98 +19,91 @@ function _CreateState(promise, namer, fileObj) {
     * and adds that to the files array and module
     * @function
     */
-    function createState(entry, files) {
-        var state = extractState(entry, files)
-        , data = JSON.stringify(state)
-        , naming = { "namespace": entry.name, "name": entry.stateName || cnsts.stateName }
-        ;
+    function createState(resolve, reject, entry, views) {
+        try {
+            var main = entry.name + ".views"
+            , state = JSON.parse(!!views[main] && views[main].state || "{}")
+            , keys = Object.keys(views)
+            , idRef = views["$idRef"];
 
-        data = "/**[@naming(" + JSON.stringify(naming) + ")]*/\n" + data;
+            //remove the id ref
+            keys.splice(keys.indexOf("$idRef"), 1);
 
-        files.push(fileObj(entry.stateName || cnsts.stateName, data));
+            //process each key
+            keys.forEach(function forEachView(key) {
+                var view = views[key], scope, def;
+                //skip the root entry
+                if (key !== main) {
+                    //if there is an id ref match then get the type default
+                    if (!!idRef[key]) {
+                        def = views[idRef[key].type].default;
+                    }
+                    if (key.indexOf(entry.name) === 0) {
+                        key = key.replace(entry.name + ".", "");
+                    }
+                    key = key.replace(/^views[.]?/, "");
 
-        entry.module[entry.stateEntry || cnsts.stateEntry] =
-            [ entry.name + "." + entry.stateName || cnsts.stateName, [], false];
-    }
-    /**
-    * Looks through the files array for *.state.json files
-    * @function
-    */
-    function extractState(entry, files) {
-        var state = {}, indxs = [];
+                    //convert the name to camel case
+                    //key = key.split(".")
+                    //    .map(function mapKey(val) {
+                    //        return val;
+                    //    })
+                    //    .join(".");
+                    // removed this because we should honor the case the user
+                    // used in the file path
 
-        files.forEach(function forEachFile(fileObj, indx) {
-            if(STATE_PATT.test(fileObj.file)) {
-                var obj = JSON.parse(fileObj.data)
-                , naming = namer(entry.root, fileObj)
-                , namespace = naming.namespace
-                    .replace(entry.name, "")
-                    .replace(TRIM_DOT_PATT, "$1")
-                , name = naming.name
-                    .replace(naming.namespace + ".", "")
-                    .replace(cnsts.state, "")
-                    .toLowerCase()
-                , segs = namespace.split(".")
-                , parent = state
-                ;
-
-                //ensure the parent exists
-                if (!!namespace) {
-                    //loop through the namespace segments
-                    for (var i = 0, l = segs.length, e = l - 1; i < l; i++) {
-                        segs[i] = segs[i].toLowerCase();
-                        //skip anything that starts with views
-                        if (i > 0 || segs[i] !== (entry.views || cnsts.views)) {
-                            //if there wasn't a file name, and i is the last position
-                            if (!name && i === e) {
-                                name = segs[i];
-                                break;
-                            }
-                            if (!parent.hasOwnProperty(segs[i])) {
-                                parent[segs[i]] = {};
-                            }
-                            parent = parent[segs[i]];
-                        }
+                    if (!!def) {
+                        scope = resolvePath(key, state, true);
+                        scope.parent[scope.index] =
+                            merge(scope.value, JSON.parse(def));
+                    }
+                    if (!isNill(view.state)) {
+                        scope = resolvePath(key, state, true);
+                        scope.parent[scope.index] =
+                            merge(JSON.parse(view.state), scope.value);
                     }
                 }
+            });
 
-                if (!name) {
-                    name = cnsts.state;
-                }
+            resolve(state);
+        }
+        catch(ex) {
+            reject(ex);
+        }
+    }
+    /**
+    * Creates the state file and adds it to the files array
+    * @function
+    */
+    function addState(resolve, reject, entry, files, state) {
+        try {
+            var path = entry.name + "/$$state$$.json"
+            , file = fileObj(path, JSON.stringify(state));
 
-                if (name === cnsts.state) {
-                    apply(obj, state);
-                }
-                else {
-                    parent[name] = obj;
-                }
+            files.push(file);
 
-                indxs.push(indx);
-            }
-        });
+            entry.module["state"] = [".simpleWatcher", [[":" + entry.name + ".$$state$$"], null]];
 
-        //remove the files
-        indxs.reverse();
-        indxs.forEach(function forEachIndx(indx) {
-            files.splice(indx, 1);
-        });
-
-        return state;
+            resolve();
+        }
+        catch(ex) {
+            reject(ex);
+        }
     }
 
     /**
     * @worker
     */
-    return function CreateState(entry, files) {
+    return function CreateState(entry, files, views) {
 
-        return new promise(function (resolve, reject) {
-            try {
-                createState(entry, files);
-                resolve(files);
-            }
-            catch(ex) {
-                reject(ex);
-            }
+        var proc = new promise(function (resolve, reject) {
+            return createState(resolve, reject, entry, views);
+        });
+
+        return proc.then(function (state) {
+            return new promise(function (resolve, reject) {
+                addState(resolve, reject, entry, files, state);
+            });
         });
 
     };
