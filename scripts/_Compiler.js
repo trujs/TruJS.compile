@@ -30,17 +30,33 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
   */
   function collectFiles(resolve, reject, base, manifest) {
     //an array to store the collector promises
-    var procs = [];
+    var procs = []
+    , values = []
+    , exec;
 
     //if we passed then create the collect promise, otherwise we already rejected
     //loop through the manifest, run the collector for each
     if (manifest.every(everyEntry)) {
-      promise.all(procs)
-        .then(function (values) {
-          resolve(values);
+        //run each collector asyncronously because a collector could update
+        // repositories in the file system
+        procs.forEach(function forEachProc(proc, indx) {
+            if (!exec) {
+                exec = proc;
+            }
+            else {
+                exec = exec.then(function (files) {
+                    values.push(files);
+                    return proc;
+                });
+            }
+        });
+        //after all of the collectors finish
+        exec.then(function (results) {
+            values.push(results);
+            resolve(values);
         })
         .catch(function (err) {
-          reject(err);
+            reject(err);
         });
     }
 
