@@ -8,6 +8,13 @@
       "TruJS": "{repos}/TruJS"
     }
 
+    , "repos": [{
+        "type": "git"
+        , "name": "TruJS"
+        , "url": "https://github.com/trujs/TruJS.git"
+        , "branch": "development"
+    }]
+
     , "format": "node"
 
     , "output": "./build/{name}/index.js"
@@ -15,6 +22,7 @@
     , "package": {
         "dependencies": {
             "trujs-cmdargs": "0.0.1"
+            , "simple-git": "^1.85.0"
         }
         , "repository": {
           "type": "git",

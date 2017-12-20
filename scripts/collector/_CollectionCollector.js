@@ -16,8 +16,53 @@
 *
 * @factory
 */
-function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, getScriptsDir, errors, fileObj, defaults) {
+function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, getScriptsDir, errors, fileObj, defaults, type_collection_repository) {
+  var SEP_PATT = /[/\\]/;
 
+  /**
+  * Loops through the entry's repos property and checks out the branch's that
+  * are required for the
+  * @function
+  */
+  function checkoutRepositories(resolve, reject, base, entry) {
+      var procs = []
+      , repos = entry.repos || []
+      , basePath = getWorkspacePath(base)
+      ;
+
+      //create all of the repo processes
+      repos.forEach(function forEachRepo(repoObj) {
+          var type = repoObj.type || "git"
+          , dir = repoObj.isProject && "projects" || "repos"
+          , path = basePath + "/" + dir
+          , repo = type_collection_repository[type]
+          ;
+          procs.push(repo(path, repoObj));
+      });
+
+      //run all of the repo processes
+      promise.all(procs)
+      .then(function () {
+          resolve();
+      })
+      .catch(function (ex) {
+          reject(ex);
+      });
+  }
+  /**
+  * Extracts the workspace path from the base
+  * @function
+  */
+  function getWorkspacePath(base) {
+      var segs = base.split(SEP_PATT)
+      , indx = segs.indexOf("repos");
+
+      if (indx === -1) {
+          indx = segs.indexOf("projects");
+      }
+
+      return segs.slice(0, indx).join("/");
+  }
   /**
   * Resolves all relative paths in the entry's `files` array
   * @function
@@ -90,11 +135,21 @@ function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, get
   */
   return function CollectionCollector(base, entry) {
     //setup the path to the scripts, using the default or the manifest entry
-    var scriptsPath = getScriptsDir(base, entry);
+    var scriptsPath = getScriptsDir(base, entry)
+    , proc = promise.resolve();
 
     //resolve the file paths for each member in the `files` array
-    var proc =  new Promise(function (resolve, reject) {
-      resolvePaths(resolve, reject, scriptsPath, entry);
+    if (isArray(entry.repos)) {
+        proc =  new Promise(function (resolve, reject) {
+            checkoutRepositories(resolve, reject, base, entry);
+        });
+    }
+
+    //resolve the file paths for each member in the `files` array
+    proc = proc.then(function () {
+        return new Promise(function (resolve, reject) {
+          resolvePaths(resolve, reject, scriptsPath, entry);
+        });
     });
 
     //load the file data for each path
