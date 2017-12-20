@@ -82,7 +82,7 @@ function _CreateState(promise, namer, fileObj) {
 
             files.push(file);
 
-            entry.module["state"] = [".simpleWatcher", [[":Magnetic.$$state$$"], null]];
+            entry.module["state"] = [".simpleWatcher", [[":" + entry.name + ".$$state$$"], null]];
 
             resolve();
         }
