@@ -11,11 +11,12 @@ function _ModulePreProcessor(promise, defaults, getLineEnding, preProcessor_java
   * @param {array} files An array of file objects
   */
   return function ModulePreProcessor(entry, files) {
+
     //the return value must be module
     apply(defaults.module, entry);
 
     //stitch the files together and use the data to determine the line ending
-    var lineEnding = getLineEnding(files.map((f)=>{ return f.data; }).join(" "));
+    var lineEnding = getLineEnding(files.map(function (f) { return f.data; }).join(" "));
 
     //create the module file and add it to the files array
     var file = {

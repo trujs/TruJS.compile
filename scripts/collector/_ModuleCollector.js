@@ -45,6 +45,29 @@ function _ModuleCollector(promise, collector_collection, defaults, pathParser, g
     return modulePaths;
   }
   /**
+  * Adds hints for each repo entry
+  * @function
+  */
+  function addRepoHints(entry) {
+      entry.hints = entry.hints || {};
+      if (isArray(entry.repos)) {
+          var hints = {};
+          entry.repos.forEach(function forEachRepo(item) {
+              var name = item.repo || item.name;
+              if (!entry.hints.hasOwnProperty(name)) {
+                  hints[name] = item.isProject && "{projects}" || "{repos}";
+                  hints[name]+= "/" + item.name;
+              }
+          });
+          Object.keys(hints)
+          .sort()
+          .reverse()
+          .forEach(function forEachKey(key) {
+              entry.hints[key] = hints[key];
+          });
+      }
+  }
+  /**
   * Loads all module files in the module array
   * @function
   */
@@ -105,6 +128,8 @@ function _ModuleCollector(promise, collector_collection, defaults, pathParser, g
     //get an array of all the module files we're going to load
     , modulePaths = getModulePaths(base, entry);
 
+    //add the hints
+    addRepoHints(entry);
 
     var proc = promise.resolve([]);
 
