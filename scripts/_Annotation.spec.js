@@ -173,7 +173,7 @@ function testAnnotation_Remove(arrange, act, assert, module) {
   arrange(function () {
     annotation = module(["TruJS.compile._Annotation", []]);
     text = "/**[@fake1({\"test\":\"value1\"})]*/line1\nline2\n/**[@fake2({\"test\":\"value1\"})]*/\nline3\n/**[@fake2({\"test\":\"value2\"})]*/";
-    correct = "/**[@fake1({\"test\":\"value1\"})]*/line1\nline2\nline3\n";
+    correct = "/**[@fake1({\"test\":\"value1\"})]*/line1\nline2\n\nline3\n";
   });
 
   act(function () {
@@ -196,7 +196,7 @@ function testAnnotation_Clear(arrange, act, assert, module) {
   arrange(function () {
     annotation = module(["TruJS.compile._Annotation", []]);
     text = "/**[@fake1({\"test\":\"value1\"})]*/line1\nline2\n/**[@fake2({\"test\":\"value1\"})]*/\nline3\n/**[@fake2({\"test\":\"value2\"})]*/";
-    correct = "line1\nline2\nline3\n";
+    correct = "line1\nline2\n\nline3\n";
   });
 
   act(function () {
@@ -241,15 +241,48 @@ function testAnnotation_Extract(arrange, act, assert, module) {
 
     test("The result2 1st member should be")
       .value(result, "[0]")
-      .equals("/**[@test({ \"label\":\"test1\", \"format\":\"node\" })]*/\nfunction test1() { }");
+      .equals("/**[@test({ \"label\":\"test1\", \"format\":\"node\" })]*/\nfunction test1() { }\n");
 
     test("The result2 1st member should be")
       .value(result, "[1]")
-      .equals("/**[@test({ \"label\":\"test2\" })]*/\nfunction test2() { }");
+      .equals("/**[@test({ \"label\":\"test2\" })]*/\nfunction test2() { }\n");
 
     test("The result2 1st member should be")
       .value(result, "[2]")
       .equals("/**[@test({ \"label\":\"test3\", \"format\":\"browser\" })]*/\nfunction test3() { }");
+
+  });
+}
+
+/**[@test({ "title": "TruJS.compile._Annotation: multi-line annotation" })]*/
+function testAnnotation_Get(arrange, act, assert, module) {
+  var annotation, text, result;
+
+  arrange(function () {
+    annotation = module(["TruJS.compile._Annotation", []]);
+    text = [
+        "/**[@fake({"
+        , "\"name\":\"name1\""
+        , ", \"value\":\"value1\""
+        , "})]*/"
+        , ""
+        , ""
+        , "/**[@fake({"
+        , "\"name\":\"name2\""
+        , ", \"value\":\"value2\""
+        , "})]*/"
+    ].join("\n");
+  });
+
+  act(function () {
+    result = annotation.find("fake", text);
+  });
+
+  assert(function (test) {
+      test("the result should be")
+      .value(result)
+      .stringify()
+      .equals("[{\"name\":\"name1\",\"value\":\"value1\",\"$index\":0,\"$line\":1},{\"name\":\"name2\",\"value\":\"value2\",\"$index\":54,\"$line\":7}]");
 
   });
 }

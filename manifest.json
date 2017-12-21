@@ -4,10 +4,6 @@
     , "version": "0.0.2"
     , "description": "The assembler/compiler for TruJS projects"
 
-    , "hints": {
-      "TruJS": "{repos}/TruJS"
-    }
-
     , "repos": [{
         "type": "git"
         , "name": "TruJS"
