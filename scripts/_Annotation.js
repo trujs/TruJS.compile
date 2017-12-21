@@ -10,7 +10,7 @@
 */
 function _Annotation(regExGetMatches, regExForEachMatch) {
   var LINE_SPLIT = /\r?\n/g
-  , ANNOTATION_PATT = /^\s*[\/][*][*]\s*\[@([^\(]+)(?:\((.*)\))?\]\s*[*][\/](?:\r?\n)?/gm
+  , ANNOTATION_PATT = /^[ ]*[\/][*][*]\s*\[\s*@\s*([^\(\s]+)\s*(?:\(\s*((?:.|\r|\n)*?)\s*\))(?:\][*][\/])/gm
   , TRIM_PATT = /^[\n\r ]*(.*?)[\n\r ]*$/m;
 
   /**
@@ -88,8 +88,7 @@ function _Annotation(regExGetMatches, regExForEachMatch) {
   function getAll(text) {
     var annotations = {};
 
-    regExGetMatches(ANNOTATION_PATT, text).forEach(function forEachMatch(match) {
-
+    regExForEachMatch(ANNOTATION_PATT, text, function forEachMatch(match) {
       //grp1 should be the name
       var name = match[1]
       //the second grp is the values
@@ -97,7 +96,7 @@ function _Annotation(regExGetMatches, regExForEachMatch) {
       , data = JSON.parse(params);
 
       data.$index = match.index;
-      data.$line = getLineNumber(data, match.index);
+      data.$line = getLineNumber(text, match.index);
 
       if (!annotations[name]) {
         annotations[name] = [];
@@ -170,7 +169,7 @@ function _Annotation(regExGetMatches, regExForEachMatch) {
   * @function
   */
   function getLineNumber(text, index) {
-    var line = 0;
+    var line = 1;
 
     regExForEachMatch(LINE_SPLIT, text, function (match) {
       if (match.index <= index) {
