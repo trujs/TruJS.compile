@@ -81,12 +81,17 @@ function testCompiler3(arrange, act, assert, promise, callback, module) {
   var compiler, $container, modules, base, manifest, res;
 
   arrange(function () {
-    modules = [];
+    modules = {};
     $container = callback(function (name) {
-      var mcb;
-      return mcb = modules[modules.length] = callback(function(a, b) {
-        return promise.resolve([1, 2]);
-      });
+        if (!modules.hasOwnProperty(name)) {
+            modules[name] = callback(function(a, b) {
+                if (Array.isArray(b)) {
+                    return promise.resolve(b.concat([name]));
+                }
+                return promise.resolve([name]);
+            });
+        }
+        return modules[name];
     });
     $container.hasDependency = callback(true);
     compiler = module(["TruJS.compile._Compiler", [, $container]]);
@@ -96,7 +101,9 @@ function testCompiler3(arrange, act, assert, promise, callback, module) {
       , "name": "mycol"
     }, {
       "type": "javascript"
-      , "include": ["mycol"]
+      , "includes": {
+          "postCollector": ["mycol"]
+      }
     }];
   });
 
@@ -114,15 +121,50 @@ function testCompiler3(arrange, act, assert, promise, callback, module) {
 
   assert(function (test) {
     test("res should not be an Error")
-      .value(res)
-      .not()
-      .isError();
+    .value(res)
+    .not()
+    .isError();
 
-    test("The call to the 7th module's 2nd argument should be")
-      .run(modules[6].getArgs, [0])
-      .value("{value}", "[1]")
-      .toString()
-      .equals("1,2,1,2");
+    test("the modules collection should have x properties")
+    .value(modules)
+    .hasPropertyCountOf(10);
+
+    test("the collector collection should be called once")
+    .value(modules[".collector.collection"])
+    .hasBeenCalled(1);
+
+    test("the collector collection should be called with")
+    .value(modules[".collector.collection"])
+    .hasBeenCalledWith([base, manifest[0], 0]);
+
+    test("the collector javascript should be called once")
+    .value(modules[".collector.javascript"])
+    .hasBeenCalled(1);
+
+    test("the collector javascript should be called with")
+    .value(modules[".collector.javascript"])
+    .hasBeenCalledWith([base, manifest[1], 1]);
+
+    test("the preProcessor javascript should be called once")
+    .value(modules[".preProcessor.javascript"])
+    .hasBeenCalled(1);
+
+    test("the assembler javascript should be called once")
+    .value(modules[".assembler.javascript"])
+    .hasBeenCalled(1);
+
+    test("the formatter javascript should be called once")
+    .value(modules[".formatter.javascript"])
+    .hasBeenCalled(1);
+
+    test("the postProcessor javascript should be called once")
+    .value(modules[".postProcessor.javascript"])
+    .hasBeenCalled(1);
+
+    test("res should be")
+    .value(res)
+    .stringify()
+    .equals("[{\"type\":\"collection\",\"name\":\"mycol\",\"files\":[\".collector.collection\",\".preProcessor.collection\",\".assembler.collection\",\".formatter.collection\",\".postProcessor.collection\"]},{\"type\":\"javascript\",\"includes\":{\"postCollector\":[\"mycol\"]},\"files\":[\".collector.collection\",\".collector.javascript\",\".preProcessor.javascript\",\".assembler.javascript\",\".formatter.javascript\",\".postProcessor.javascript\"]}]");
 
   });
 }
@@ -140,7 +182,9 @@ function testCompiler4(arrange, act, assert, promise, callback, module) {
     base = "/base";
     manifest = [{
       "type": "javascript"
-      , "include": ["mycol"]
+      , "include": {
+          "postCollector": ["mycol"]
+      }
     }];
   });
 

@@ -104,8 +104,8 @@ function _JavaScriptPreProcessor(promise, annotation, defaults, type_javascript_
   */
   return function JavaScriptPreProcessor(entry, files) {
     //set some defaults
-    applyIf(defaults["all"], entry);
-    applyIf(defaults[entry.format], entry);
+    applyIf(defaults.entry["all"], entry);
+    applyIf(defaults.entry[entry.format], entry);
 
     return new promise(function (resolve, reject) {
       processFiles(resolve, reject, entry, files);

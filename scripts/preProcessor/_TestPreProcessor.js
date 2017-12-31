@@ -14,6 +14,16 @@ function _TestPreProcessor(promise, annotation, defaults, stringTrim, nodePath, 
   function processFiles(resolve, reject, entry, files) {
     var data = [];
 
+    files.sort(function (a, b) {
+        if (a.path < b.path) {
+            return -1;
+        }
+        else if (a.path > b.path) {
+            return 1;
+        }
+        return 0;
+    });
+
     //loop through the files
     files.forEach(function forEachFile(file) {
         var tests = extractTests(file, entry.format);
@@ -66,9 +76,6 @@ function _TestPreProcessor(promise, annotation, defaults, stringTrim, nodePath, 
   * @worker
   */
   return function TestPreProcessor(entry, files) {
-
-    //enforce some defaults
-    apply(defaults.test, entry);
 
     return new promise(function (resolve, reject) {
       processFiles(resolve, reject, entry, files);

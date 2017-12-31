@@ -1,72 +1,87 @@
 {
-  "all": {
-    "fileTypes": [],
-    "format": "browser"
-  },
-  "node": {
-    "minify": false,
-    "strict": true,
-    "lint": false,
-    "global": "global"
-  },
-  "browser": {
-    "minify": true,
-    "strict": true,
-    "lint": false,
-    "global": "window"
-  },
-  "none": {
-    "minify": false,
-    "strict": true,
-    "lint": false
-  },
-  "module": {
-    "return": "$$container$$"
-  },
-  "testFile": "test.json",
-  "testType": "test",
-  "test": {
-    "strict": false,
-    "naming": false,
-    "lint": false
-  },
-  "iocPaths": [
-    "{repos}/TruJS/TruJS.js",
-    "{repos}/TruJS/_Object.js",
-    "{repos}/TruJS/func/_Inspector.js",
-    "{repos}/TruJS/ioc/_Entry.js",
-    "{repos}/TruJS/ioc/_Container.js",
-    "{repos}/TruJS/ioc/Container.js"
-  ],
-  "minifier": {
-    "extentionMap": {
-      ".js": "javascript"
-      , ".css": "css"
-      , ".html": "html"
+    "entry": {
+        "all": {
+            "fileTypes": [],
+            "format": "browser"
+        }
+        , "module": {
+            "return": "$$container$$"
+            , "moduleFile": "module.json"
+        }
+        , "test": {
+            "strict": false
+            , "naming": false
+            , "lint": false
+            , "files": [
+              "+./*.spec.js"
+            ]
+            , "includes": {
+                "postAssembler": null
+            }
+        }
+        , "node": {
+            "minify": false
+            , "strict": true
+            , "lint": false
+            , "global": "global"
+        }
+        , "browser": {
+            "minify": true
+            , "strict": true
+            , "lint": false
+            , "global": "window"
+        }
+        , "none": {
+            "minify": false
+            , "strict": true
+            , "lint": false
+        }
     }
-    , "javascript": {
-      "mangle": false
+    , "collector": {
+        "encoding": {
+            ".js": "utf8"
+            , ".css": "utf8"
+            , ".html": "utf8"
+            , ".json": "utf8"
+            , ".txt": "utf8"
+            , ".sass": "utf8"
+            , ".xml": "utf8"
+        }
     }
-  },
-  "manifest": {
-    "manifestFile": "manifest.json"
-    , "manifestDir": "{script}/manifest.json"
-  },
-  "scriptsDir": "scripts",
-  "fileTypes": {
-    ".html": "Html",
-    ".css": "Css",
-    ".json": "Json",
-    ".xml": "Xml",
-    ".txt": "Txt"
-},
-  "encoding": {
-      ".js": "utf8",
-      ".css": "utf8",
-      ".html": "utf8",
-      ".json": "utf8",
-      ".txt": "utf8",
-      ".sass": "utf8",
-      ".xml": "utf8"
-  }
+    , "module": {
+        "iocPaths": [
+          "{repos}/TruJS/TruJS.js"
+          , "{repos}/TruJS/_Object.js"
+          , "{repos}/TruJS/func/_Inspector.js"
+          , "{repos}/TruJS/ioc/_Entry.js"
+          , "{repos}/TruJS/ioc/_Container.js"
+          , "{repos}/TruJS/ioc/Container.js"
+        ]
+    }
+    , "minifier": {
+        "extentionMap": {
+            ".js": "javascript"
+            , ".css": "css"
+            , ".html": "html"
+        }
+        , "javascript": {
+            "mangle": true
+        }
+    }
+    , "test": {
+        "testFile": "test.json"
+        , "testType": "test"
+    }
+    , "manifest": {
+        "manifestFile": "manifest.json"
+        , "manifestDir": "{script}/manifest.json"
+    }
+    , "scriptsDir": "scripts"
+    , "fileTypes": {
+        ".html": "Html"
+        , ".css": "Css"
+        , ".json": "Json"
+        , ".xml": "Xml"
+        , ".txt": "Txt"
+    }
 }

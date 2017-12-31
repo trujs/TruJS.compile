@@ -7,7 +7,7 @@
 *   files: {optional array of file paths to be appended to the output file list}
 * @factory
 */
-function _ModuleCollector(promise, collector_collection, defaults, pathParser, getScriptsDir, type_module_moduleFileLoader, type_module_moduleFileProcessor, type_module_modulePathProcessor, nodePath, type_module_moduleMerger) {
+function _ModuleCollector(promise, getScriptsDir, defaults, pathParser, nodePath, type_module_checkoutRepositories, type_module_moduleFileLoader, type_module_moduleMerger, type_module_filePicker) {
   var cnsts = {
     "module": "module.json"
   };
@@ -37,7 +37,7 @@ function _ModuleCollector(promise, collector_collection, defaults, pathParser, g
     }
 
     //add the current entry's module path at the end
-    if (entry.moduleFile !== "") {
+    if (!isEmpty(entry.moduleFile)) {
       curModule = pathParser(base, entry.moduleFile || cnsts.module);
       modulePaths.push(curModule);
     }
@@ -84,88 +84,67 @@ function _ModuleCollector(promise, collector_collection, defaults, pathParser, g
   * Add the require ioc paths and add any files from the manifest entry
   * @function
   */
-  function augmentPaths(entry, scriptsPath, paths) {
+  function augmentPaths(base, entry) {
+    var scriptsPath = getScriptsDir(base, entry)
     //add the required ioc paths
-    paths = addIocPaths(scriptsPath, paths);
+    , paths = addIocPaths(scriptsPath);
     //add any paths in the entry's files property
-    return addEntryFiles(scriptsPath, paths, entry.files);
+    if(!!entry.files) {
+      paths = paths.concat(entry.files);
+    }
+    return paths;
   }
   /**
   * Add the required ioc entries from the defaults
   * @function
   */
-  function addIocPaths(scriptsPath, paths) {
+  function addIocPaths(scriptsPath) {
     //convert the iocPaths constants into real paths
-    var allPaths = defaults.iocPaths.map(function mapIocPaths(path) {
+    return defaults.module.iocPaths.map(function mapIocPaths(path) {
       return pathParser(scriptsPath, path).path;
     });
-
-    //only add the non-ioc paths from our compiled array of paths
-    return allPaths
-      .concat(paths.filter(function filterPaths(path) {
-        if (allPaths.indexOf(path) === -1) {
-          return true;
-        }
-      }));
-  }
-  /**
-  * Adds any members from the entry's files array to the end of the paths array
-  * @function
-  */
-  function addEntryFiles(scriptsPath, paths, files) {
-    if(!!files) {
-      return paths.concat(files);
-    }
-    return paths;
   }
 
   /**
   * @worker
   */
   return function ModuleCollector(base, entry) {
-    //setup the path to the scripts, using the default or the manifest entry
-    var scriptsPath = getScriptsDir(base, entry)
-    //get an array of all the module files we're going to load
-    , modulePaths = getModulePaths(base, entry);
+    //apply the defaults
+    applyIf(defaults.entry.module, entry);
+    //the return must be the default
+    entry.return = defaults.entry.module.return;
 
-    //add the hints
-    addRepoHints(entry);
-
-    var proc = promise.resolve([]);
+    //set the repositories to the required branches
+    var proc = type_module_checkoutRepositories(base, entry);
 
     //get the module file data
-    if (!isEmpty(modulePaths)) {
-      proc = proc.then(function () {
-        return loadModules(modulePaths);
-      });
-    }
+    proc = proc.then(function () {
+        var modulePaths = getModulePaths(base, entry);
+        //add the hints
+        addRepoHints(entry);
+        //if there are module paths, load the files
+        if (!isEmpty(modulePaths)) {
+            return loadModules(modulePaths);
+        }
+        return promise.resolve();
+    });
 
     //merge all of the module objects
     proc = proc.then(function (modules) {
-      //there could be a module object in the manifest entry, append to the end
-      if (!!entry.module) {
-        modules.push(entry.module);
-      }
-      return type_module_moduleMerger(modules);
+        //there could be a module object in the manifest entry, append to the end
+        if (!!entry.module) {
+            modules.push(entry.module);
+        }
+        return type_module_moduleMerger(modules);
     });
 
-    //use the module to get the list of file paths
-    proc = proc.then(function (module) {
-      entry.module = module;//update the entry module object
-      return type_module_moduleFileProcessor(entry, module);
-    });
-
-    //determine the file type and verify the paths iteratively
-    proc = proc.then(function (pathsObj) {
-      return type_module_modulePathProcessor(scriptsPath, pathsObj);
-    });
-
-    //use the collection collector to load the files
-    return proc.then(function (paths) {
-      //augment the paths and set the files property
-      entry.files = augmentPaths(entry, scriptsPath, paths);
-      //pass the buck to the standard collection collector
-      return collector_collection(base, entry);
+    return proc.then(function (module) {
+        //update the entry module object
+        entry.module = module;
+        //augment the paths and set the files property
+        entry.files = augmentPaths(base, entry);
+        //start the file loading process
+        return type_module_filePicker(base, entry);
     });
 
   };

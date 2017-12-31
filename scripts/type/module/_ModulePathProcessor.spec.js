@@ -1,19 +1,13 @@
 /**[@test({ "title": "TruJS.compile.type.module._ModulePathProcessor: all entries resolve"})]*/
-function testModulePathProcessor1(arrange, act, assert, callback, module) {
-  var modulePathProcessor, nodeFs, scriptsPath, pathsObj, res;
+function testModulePathProcessor1(arrange, act, assert, callback, promise, module) {
+  var modulePathProcessor, modulePathFinder, scriptsPath, pathsObj, res;
 
   arrange(function () {
-    nodeFs = {
-      "stat": callback(function (path, cb) {
-        if (path.indexOf("testMethod") !== -1) {
-          cb("fail");
-        }
-        else {
-          cb();
-        }
-      })
-    };
-    modulePathProcessor = module(["TruJS.compile.type.module._ModulePathProcessor", [, nodeFs]]);
+    modulePathFinder = callback(promise.resolve());
+    modulePathProcessor = module([
+        "TruJS.compile.type.module._ModulePathProcessor"
+        , [, , modulePathFinder]
+    ]);
     scriptsPath = "/base/scripts";
     pathsObj = {
       "TruJS.test._TestFactory1": "_TestFactory1",
@@ -41,9 +35,9 @@ function testModulePathProcessor1(arrange, act, assert, callback, module) {
       .not()
       .isError();
 
-    test("The nodeFs.stat callback should be called 6 times")
-      .value(nodeFs.stat)
-      .hasBeenCalled(6);
+    test("The modulePathFinder callback should be called 4 times")
+      .value(modulePathFinder)
+      .hasBeenCalled(4);
 
     test("res should have 4 members")
       .value(res)
@@ -51,54 +45,16 @@ function testModulePathProcessor1(arrange, act, assert, callback, module) {
   });
 }
 
-/**[@test({ "title": "TruJS.compile.type.module._ModulePathProcessor: bad module entry"})]*/
-function testModulePathProcessor2(arrange, act, assert, callback, module) {
-  var modulePathProcessor, nodeFs, scriptsPath, pathsObj, res;
-
-  arrange(function () {
-    nodeFs = {
-      "stat": callback(function (path, cb) {
-        cb("fail");
-      })
-    };
-    modulePathProcessor = module(["TruJS.compile.type.module._ModulePathProcessor", [, nodeFs]]);
-    scriptsPath = "/base/scripts";
-    pathsObj = {
-      "TruJS.test._TestFactory1": "_TestFactory1"
-    };
-  });
-
-  act(function (done) {
-    modulePathProcessor(scriptsPath, pathsObj)
-      .then(function (results) {
-        res = results;
-        done();
-      })
-      .catch(function (err) {
-        res = err;
-        done();
-      });
-  });
-
-  assert(function (test) {
-    test("res should be an error")
-      .value(res)
-      .isError();
-
-  });
-}
-
 /**[@test({ "title": "TruJS.compile.type.module._ModulePathProcessor: empty pathsObj"})]*/
-function testModulePathProcessor2(arrange, act, assert, callback, module) {
-  var modulePathProcessor, nodeFs, scriptsPath, pathsObj, res;
+function testModulePathProcessor2(arrange, act, assert, callback, promise, module) {
+  var modulePathProcessor, modulePathFinder, scriptsPath, pathsObj, res;
 
   arrange(function () {
-    nodeFs = {
-      "stat": callback(function (path, cb) {
-        cb("fail");
-      })
-    };
-    modulePathProcessor = module(["TruJS.compile.type.module._ModulePathProcessor", [, nodeFs]]);
+    modulePathFinder = callback(promise.resolve());
+    modulePathProcessor = module([
+        "TruJS.compile.type.module._ModulePathProcessor"
+        , [, , modulePathFinder]
+    ]);
     scriptsPath = "/base/scripts";
     pathsObj = {};
   });
