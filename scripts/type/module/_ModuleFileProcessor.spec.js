@@ -16,11 +16,12 @@ function testModuleProcessor1(arrange, act, assert, module) {
       , "hints": {
         "TruJS": "./{projects}/TruJS"
       }
+      , "module": moduleObj
     };
   });
 
   act(function (done) {
-    moduleFileProcessor(entry, moduleObj)
+    moduleFileProcessor(entry)
       .then(function (results) {
         res = results;
         done();
@@ -75,11 +76,12 @@ function testModuleProcessor2(arrange, act, assert, module) {
     };
     entry = {
       "name": "TruJS.test"
+      , "module": moduleObj
     };
   });
 
   act(function (done) {
-    moduleFileProcessor(entry, moduleObj)
+    moduleFileProcessor(entry)
       .then(function (results) {
         res = results;
         done();

@@ -9,7 +9,13 @@ var cmdArgs = require('trujs-cmdargs')(process.argv)
 //resolve the compiler worker from the compile container
 , run = compile('.run')
 , saver = compile('.saver')
+, compileReporter = compile(".compileReporter")
 ;
+
+compileReporter.addHandler(function (msg, type) {
+    console.log(msg);
+});
+compileReporter.setLevels("all");
 
 console.log("*****************************************************");
 console.log("Starting the compiler");

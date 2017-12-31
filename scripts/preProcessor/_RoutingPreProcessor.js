@@ -26,6 +26,11 @@ function _RoutingPreProcessor(promise, preProcessor_module, type_route_server, a
       , "nodePath": [":require('path')"]
       , "nodeDirName": [":__dirname"]
     }
+    , "entries": {
+        "serve": "$serve$"
+        , "server": "$server$"
+        , "routing": "$routing$"
+    }
   };
 
   /**
@@ -128,11 +133,11 @@ function _RoutingPreProcessor(promise, preProcessor_module, type_route_server, a
   */
   function updateModule(resolve, reject, entry, routes) {
     try {
-      //add the $$server$$ entry to the module
-      entry.module["$$server$$"] = entry.module["$$server$$"] || [{}];
+      //add the server entry to the module
+      entry.module[cnsts.entries.server] = entry.module[cnsts.entries.server] || [{}];
 
-      //get the $$server$$ object for easy adding
-      var server = entry.module["$$server$$"][0]
+      //get the server object for easy adding
+      var server = entry.module[cnsts.entries.server][0]
       , apps = server["apps"] = (server["apps"] || [{}])
       , rtes = server["routers"] = (server["routers"] || [{}])
       , mdlwr = server["middleware"] = (server["middleware"] || [{}])
@@ -284,8 +289,8 @@ function _RoutingPreProcessor(promise, preProcessor_module, type_route_server, a
   function addDependencies(resolve, reject, entry) {
     try {
       //add the routing entry
-      entry.module["$$routing$$"] = entry.module["$$routing$$"] || [{}];
-      applyIf(cnsts.dependencies, entry.module["$$routing$$"][0]);
+      entry.module[cnsts.entries.routing] = entry.module[cnsts.entries.routing] || [{}];
+      applyIf(cnsts.dependencies, entry.module[cnsts.entries.routing][0]);
       resolve();
     }
     catch(ex) {
@@ -308,7 +313,7 @@ function _RoutingPreProcessor(promise, preProcessor_module, type_route_server, a
       files.push(serverFileObj);
 
       //add the module entry
-      entry.module["$$serve$$"] = [name, []];
+      entry.module[cnsts.entries.serve] = [name, []];
 
       resolve();
     }

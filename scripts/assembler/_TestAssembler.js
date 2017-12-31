@@ -12,10 +12,9 @@ function _TestAssembler(promise, getLineEnding, errors, defaults, nodePath, file
   function stitchTest(resolve, reject, entry, files) {
     var lineEnding = getLineEnding(files[0].data)
     , isErr
-    , path = nodePath.parse(entry.testFile || entry.output || defaults.testFile).base
+    , path = entry.testFile || defaults.test.testFile
     , data = []
     ;
-
     //add a json object entry for each file
     files.forEach(function forEachFile(test) {
       if (!isErr) {
@@ -27,7 +26,7 @@ function _TestAssembler(promise, getLineEnding, errors, defaults, nodePath, file
         }
 
         //ensure there is a type
-        test.type = test.type || defaults.testType;
+        test.type = test.type || defaults.test.testType;
 
         //add the test object
         data.push(

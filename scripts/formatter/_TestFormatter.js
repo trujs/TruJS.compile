@@ -3,7 +3,8 @@
 * on the entry format
 * @factory
 */
-function _TestFormatter(promise) {
+function _TestFormatter(promise, defaults, stringInsert) {
+    var LN_END_PATT = /(\r?\n)/g;
 
     /**
     * @worker
@@ -12,14 +13,24 @@ function _TestFormatter(promise) {
 
         return new promise(function (resolve, reject) {
             try {
-                if (entry.format === "browser") {
-                    files[0].ext = ".js";
-                    files[0].data = "TruJSTest('.testPackage').init(" + files[0].data + ");";
+                if (files.length === 2) {
+                    var fileUnderTest = files.pop().data
+                    , rtrn = "return " + (entry.return || defaults.entry.module.return)
+                    , value = "function () {\n" + fileUnderTest + "\n\t" + rtrn + ";\n}"
+                    , futEntry = [
+                        "{"
+                        , "\"label\": \"module\""
+                        , ", \"type\": \"singleton\""
+                        , ", \"value\": " + JSON.stringify(value.replace(LN_END_PATT, "$1\t"))
+                        , "}"
+                    ].join("\n");
+
+                    files[0].data = stringInsert(
+                        files[0].data
+                        , "," + futEntry
+                        , files[0].data.length - 1
+                    );
                 }
-                else if (entry.format === "node") {
-                    files[0].ext = ".json";
-                }
-                files[0].file = files[0].name + files[0].ext;
 
                 resolve(files);
             }
