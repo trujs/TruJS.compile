@@ -21,6 +21,7 @@ function _RoutingPreProcessor(promise, preProcessor_module, type_route_server, a
       "nodeExpress": [":require('express')"]
       , "nodeHttp": [":require('http')"]
       , "nodeHttps": [":require('https')"]
+      , "routeReporter": ["TruJS.log._Reporter", []]
       , "routingErrors": type_route_routingErrors
       , "nodePath": [":require('path')"]
       , "nodeDirName": [":__dirname"]
