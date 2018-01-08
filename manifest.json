@@ -1,14 +1,11 @@
 {
     "name": "TruJS.compile"
-    , "version": "0.1.1"
+    , "version": "0.1.2"
     , "entries": [
         {
             "type": "module"
             , "description": "The assembler/compiler for TruJS projects"
 
-            , "hints": {
-                "TruJS": "{repos}/TruJS"
-            }
             , "repos": [{
                 "type": "git"
                 , "name": "TruJS"
@@ -25,16 +22,21 @@
                     "trujs-cmdargs": "^0.0.3"
                     , "simple-git": "^1.85.0"
                 }
+                , "keywords": [
+                  "TruJS"
+                  , "compile"
+                  , "assemble"
+                ]
                 , "repository": {
-                  "type": "git",
-                  "url": "git+https://github.com/trujs/TruJS.compile.git"
-                },
-                "author": "Rodger McIntosh",
-                "license": "MIT",
-                "bugs": {
+                  "type": "git"
+                  , "url": "git+https://github.com/trujs/TruJS.compile.git"
+                }
+                , "author": "Rodger McIntosh"
+                , "license": "MIT"
+                , "bugs": {
                   "url": "https://github.com/trujs/TruJS.compile/issues"
-                },
-                "homepage": "https://github.com/trujs/TruJS.compile#readme"
+                }
+                , "homepage": "https://github.com/trujs/TruJS.compile#readme"
             }
         }
         , {
@@ -44,24 +46,17 @@
           , "output": "./builds/{name}/"
         }
         , {
-          "type": "javascript"
-          , "description": "The TruJS.compile command line untility"
+          "type": "files"
+          , "description": "The TruJS.compile command line untility and readme file"
 
           , "files": [
             "../cli.js"
+            , "../README.md"
           ]
 
           , "format": "none"
 
-          , "output": "./builds/{name}/cli.js"
-        }
-        , {
-            "type": "files"
-            , "description": "The readme file for the npm package"
-            , "files": [
-                "../README.md"
-            ]
-            , "output": "./builds/{name}/"
+          , "output": "./builds/{name}/"
         }
     ]
 }
