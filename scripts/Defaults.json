@@ -51,7 +51,6 @@
                 , "global": [":global"]
                 , "performance": ["TruJS.timing._Performance", []]
                 , "funcAsync": ["TruJS.func._Async", []]
-                , "routeReporter": ["TruJS.log._Reporter", []]
             }
         }
     }
