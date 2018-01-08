@@ -57,6 +57,9 @@ function _ModuleCollector(promise, getScriptsDir, defaults, pathParser, nodePath
               if (!entry.hints.hasOwnProperty(name)) {
                   hints[name] = item.isProject && "{projects}" || "{repos}";
                   hints[name]+= "/" + item.name;
+                  if (!!item.scriptsDir) {
+                      hints[name]+= "/" + item.scriptsDir;
+                  }
               }
           });
           Object.keys(hints)
