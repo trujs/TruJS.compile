@@ -24,7 +24,7 @@ function _TestFormatter(promise, defaults, stringInsert) {
                         , ", \"value\": " + JSON.stringify(value.replace(LN_END_PATT, "$1\t"))
                         , "}"
                     ].join("\n");
-
+                    //add the new dependency entry to the file json
                     files[0].data = stringInsert(
                         files[0].data
                         , "," + futEntry

@@ -1,55 +1,67 @@
 {
     "name": "TruJS.compile"
-    , "version": "0.1.0"
-    , "entries": [{
-        "type": "module"
-        , "description": "The assembler/compiler for TruJS projects"
+    , "version": "0.1.1"
+    , "entries": [
+        {
+            "type": "module"
+            , "description": "The assembler/compiler for TruJS projects"
 
-        , "hints": {
-            "TruJS": "{repos}/TruJS"
-        }
-        , "repos": [{
-            "type": "git"
-            , "name": "TruJS"
-            , "url": "https://github.com/trujs/TruJS.git"
-            , "branch": "development"
-        }]
-
-        , "format": "node"
-
-        , "output": "./builds/{name}/index.js"
-
-        , "package": {
-            "dependencies": {
-                "trujs-cmdargs": "0.0.1"
-                , "simple-git": "^1.85.0"
+            , "hints": {
+                "TruJS": "{repos}/TruJS"
             }
-            , "repository": {
-              "type": "git",
-              "url": "git+https://github.com/trujs/TruJS.compile.git"
-            },
-            "author": "Rodger McIntosh",
-            "license": "MIT",
-            "bugs": {
-              "url": "https://github.com/trujs/TruJS.compile/issues"
-            },
-            "homepage": "https://github.com/trujs/TruJS.compile#readme"
+            , "repos": [{
+                "type": "git"
+                , "name": "TruJS"
+                , "url": "https://github.com/trujs/TruJS.git"
+                , "branch": "development"
+            }]
+
+            , "format": "node"
+
+            , "output": "./builds/{name}/index.js"
+
+            , "package": {
+                "dependencies": {
+                    "trujs-cmdargs": "^0.0.3"
+                    , "simple-git": "^1.85.0"
+                }
+                , "repository": {
+                  "type": "git",
+                  "url": "git+https://github.com/trujs/TruJS.compile.git"
+                },
+                "author": "Rodger McIntosh",
+                "license": "MIT",
+                "bugs": {
+                  "url": "https://github.com/trujs/TruJS.compile/issues"
+                },
+                "homepage": "https://github.com/trujs/TruJS.compile#readme"
+            }
         }
-    }, {
-      "type": "test"
-      , "description": "The test package for node"
+        , {
+          "type": "test"
+          , "description": "The test package for node"
 
-      , "output": "./builds/{name}/"
-    }, {
-      "type": "javascript"
-      , "description": "The TruJS.compile command line untility"
+          , "output": "./builds/{name}/"
+        }
+        , {
+          "type": "javascript"
+          , "description": "The TruJS.compile command line untility"
 
-      , "files": [
-        "../cli.js"
-      ]
+          , "files": [
+            "../cli.js"
+          ]
 
-      , "format": "none"
+          , "format": "none"
 
-      , "output": "./builds/{name}/cli.js"
-    }]
+          , "output": "./builds/{name}/cli.js"
+        }
+        , {
+            "type": "files"
+            , "description": "The readme file for the npm package"
+            , "files": [
+                "../README.md"
+            ]
+            , "output": "./builds/{name}/"
+        }
+    ]
 }

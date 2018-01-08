@@ -4,23 +4,14 @@
 * collector
 * @factory
 */
-function _RoutingCollector(promise, collector_module) {
-  var cnsts = {
-    "defaults": {
-      "files": [
-        "+./*.route.js"
-        , "{repos}/TruJS/log/_Reporter.js"
-      ]
-      , "moduleFile": "route.module.json"
-    }
-  };
+function _RoutingCollector(promise, collector_module, defaults) {
 
   /**
   * @worker
   */
   return function RoutingCollector(base, entry) {
     //set the defaults
-    applyIf(cnsts.defaults, entry);
+    update(entry, defaults.entry.routing);
 
     //run the module collector
     return collector_module(base, entry);
