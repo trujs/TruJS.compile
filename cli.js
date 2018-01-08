@@ -33,8 +33,9 @@ compileReporter.addHandler(function (msg, type) {
     }
 });
 
-console.log("*****************************************************");
-console.log("Starting the compiler");
+compileReporter.report("seperator", "*****************************************************");
+compileReporter.info("Starting the compiler");
+compileReporter.group("compiler");
 
 //run the compiler
 run(cmdArgs)
@@ -42,8 +43,11 @@ run(cmdArgs)
     return saver(manifest);
   })
   .then(function () {
-    console.log("Finished Processing");
+    compileReporter.groupEnd("compiler");
+    compileReporter.info("Finished Processing");
   })
   .catch(function(err) {
-    console.log(err);
+    compileReporter.groupEnd("compiler");
+    compileReporter.report("seperator", "");
+    compileReporter.error(err);
   });
