@@ -10,7 +10,7 @@
                 "type": "git"
                 , "name": "TruJS"
                 , "url": "https://github.com/trujs/TruJS.git"
-                , "branch": "development"
+                , "branch": "version-0.1"
             }]
 
             , "format": "node"

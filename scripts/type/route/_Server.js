@@ -1,22 +1,22 @@
 /**
-* This factory produces a worker function that implements the $$server$$ module
+* This factory produces a worker function that implements the $server$ module
 * entry with the express, http, and https modules using the configuration object
 * passed to the worker function.
 * @factory
 */
-function _Server(promise, $$server$$, $$routing$$_nodeExpress, $$routing$$_nodeHttp, $$routing$$_nodeHttps, $$routing$$_routingErrors, $$routing$$_routeReporter, $$routing$$_nodeDirName, $$routing$$_nodePath ) {
+function _Server(promise, $server$, $routing$_nodeExpress, $routing$_nodeHttp, $routing$_nodeHttps, $routing$_routingErrors, $routing$_routeReporter, $routing$_nodeDirName, $routing$_nodePath ) {
   var REGEX_PATT = /^:\/(.*)\/([gim]{0,3})$/
-  , nodeExpress = $$routing$$_nodeExpress
-  , nodeHttp = $$routing$$_nodeHttp
-  , nodeHttps = $$routing$$_nodeHttps
-  , routingErrors = $$routing$$_routingErrors
-  , routeReporter = $$routing$$_routeReporter
-  , nodeDirName = $$routing$$_nodeDirName
-  , nodePath = $$routing$$_nodePath
+  , nodeExpress = $routing$_nodeExpress
+  , nodeHttp = $routing$_nodeHttp
+  , nodeHttps = $routing$_nodeHttps
+  , routingErrors = $routing$_routingErrors
+  , routeReporter = $routing$_routeReporter
+  , nodeDirName = $routing$_nodeDirName
+  , nodePath = $routing$_nodePath
   ;
 
   /**
-  * Uses the $$server$$ to create first the apps and then the routes
+  * Uses the $server$ to create first the apps and then the routes
   * @function
   */
   function processServer(resolve, reject, appList) {
@@ -56,12 +56,12 @@ function _Server(promise, $$server$$, $$routing$$_nodeExpress, $$routing$$_nodeH
     var apps = {};
 
     //loop through the apps (use the factories object as the base)
-    Object.keys($$server$$.apps).forEach(function forEachKey(key) {
+    Object.keys($server$.apps).forEach(function forEachKey(key) {
       //create the express app
-      $$server$$.apps[key].app = nodeExpress();
+      $server$.apps[key].app = nodeExpress();
       routeReporter.extended("Adding app [" + key + "]");
       //add to the application list
-      apps[key] = $$server$$.apps[key];
+      apps[key] = $server$.apps[key];
     });
 
     return apps;
@@ -75,10 +75,10 @@ function _Server(promise, $$server$$, $$routing$$_nodeExpress, $$routing$$_nodeH
     var routers = {};
 
     //loop through the routers
-    Object.keys($$server$$.routers).forEach(function forEachKey(key) {
+    Object.keys($server$.routers).forEach(function forEachKey(key) {
       //get the factory and meta data
-      var worker = $$server$$.routers[key].factory
-      , meta = $$server$$.routers[key].meta
+      var worker = $server$.routers[key].factory
+      , meta = $server$.routers[key].meta
       //get the path, converting string RegEx to RegExp
       , path = getPath(meta.path)
       //create the route object
@@ -100,7 +100,7 @@ function _Server(promise, $$server$$, $$routing$$_nodeExpress, $$routing$$_nodeH
     return routers;
   }
   /**
-  * Loops through the $$server$$.middleware collection, gets the worker, and
+  * Loops through the $server$.middleware collection, gets the worker, and
   * determines if the middleware should be added added after the routers
   * @function
   */
@@ -108,10 +108,10 @@ function _Server(promise, $$server$$, $$routing$$_nodeExpress, $$routing$$_nodeH
       var middleware = {};
 
       //loop through the routers
-      Object.keys($$server$$.middleware).forEach(function forEachKey(key) {
+      Object.keys($server$.middleware).forEach(function forEachKey(key) {
         //get the factory and meta data
-        var worker = $$server$$.middleware[key].factory
-        , meta = $$server$$.middleware[key].meta
+        var worker = $server$.middleware[key].factory
+        , meta = $server$.middleware[key].meta
         , afterRouters = !!meta.afterRouters
         ;
         middleware[key] = {
@@ -329,7 +329,7 @@ function _Server(promise, $$server$$, $$routing$$_nodeExpress, $$routing$$_nodeH
   */
   return function Server(config) {
 
-    //loop throught the $$server$$ object
+    //loop throught the $server$ object
     var proc = new promise(function (resolve, reject) {
       processServer(resolve, reject);
     });
