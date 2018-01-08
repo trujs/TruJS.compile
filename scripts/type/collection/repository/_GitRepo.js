@@ -47,11 +47,11 @@ function _GitRepo(promise, nodeFs, type_collection_gitDriver) {
                 }
             });
         });
-        //do a fetch to get any branches
+        //do a pull to get any branches and updates
         proc = proc.then(function () {
             var git = type_collection_gitDriver(basePath + "/" + repoObj.name);
             return new promise(function (resolve, reject) {
-                git.fetch(function (err) {
+                git.pull(function (err) {
                     if (!!err) {
                         reject(err);
                     }
