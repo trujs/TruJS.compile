@@ -65,7 +65,6 @@
             , "modulePathProcessor": ["TruJS.compile.type.module._ModulePathProcessor", []]
             , "modulePathFinder": ["TruJS.compile.type.module._ModulePathFinder", []]
             , "moduleFileProcessor": ["TruJS.compile.type.module._ModuleFileProcessor", []]
-
         }]
         , "route": [{
           "server": ["TruJS.compile.type.route._Server", [], false]
@@ -73,9 +72,6 @@
         }]
         , "sass": [{
             "sassRender": [":require('node-sass').render"]
-        }]
-        , "test": [{
-            "testIndex": ["TruJS.compile.type.test.indexHtml", [], false]
         }]
         , "view": [{
             "createView": ["TruJS.compile.type.view._CreateView", []]

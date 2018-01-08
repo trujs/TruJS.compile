@@ -314,7 +314,7 @@ function _RoutingPreProcessor(promise, preProcessor_module, type_route_server, a
 
       //add the module entry
       entry.module[cnsts.entries.serve] = [name, []];
-
+      
       resolve();
     }
     catch(ex) {

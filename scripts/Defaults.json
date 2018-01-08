@@ -36,6 +36,24 @@
             , "strict": true
             , "lint": false
         }
+        , "routing": {
+            "files": [
+              "+./*.route.js"
+              , "{repos}/TruJS/log/_Reporter.js"
+            ]
+            , "moduleFile": "route.module.json"
+            , "hints": {
+                "TruJS": "{repos}/TruJS"
+            }
+            , "module": {
+                "root": [{"TruJS":[":TruJS"]}]
+                , "promise": [":Promise"]
+                , "global": [":global"]
+                , "performance": ["TruJS.timing._Performance", []]
+                , "funcAsync": ["TruJS.func._Async", []]
+                , "routeReporter": ["TruJS.log._Reporter", []]
+            }
+        }
     }
     , "collector": {
         "encoding": {
