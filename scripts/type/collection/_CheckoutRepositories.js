@@ -2,9 +2,9 @@
 *
 * @factory
 */
-function _CheckoutRepositories(promise, type_collection_repository) {
+function _CheckoutRepositories(promise, type_collection_repository, compileReporter) {
     var SEP_PATT = /[/\\]/;
-    
+
     /**
     * Loops through the entry's repos property and checks out the branch's that
     * are required for the
@@ -15,6 +15,9 @@ function _CheckoutRepositories(promise, type_collection_repository) {
         , repos = entry.repos || []
         , basePath = getWorkspacePath(base)
         ;
+
+        compileReporter.group("repositories");
+        compileReporter.info("Checking out " + repos.length + " repositories");
 
         //create all of the repo processes
         repos.forEach(function forEachRepo(repoObj) {
@@ -29,6 +32,9 @@ function _CheckoutRepositories(promise, type_collection_repository) {
         //run all of the repo processes
         promise.all(procs)
         .then(function () {
+            compileReporter.info("Finished checking out repositories");
+            compileReporter.groupEnd("repositories");
+
             resolve();
         })
         .catch(function (ex) {

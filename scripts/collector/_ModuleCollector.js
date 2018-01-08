@@ -57,6 +57,9 @@ function _ModuleCollector(promise, getScriptsDir, defaults, pathParser, nodePath
               if (!entry.hints.hasOwnProperty(name)) {
                   hints[name] = item.isProject && "{projects}" || "{repos}";
                   hints[name]+= "/" + item.name;
+                  if (!!item.scriptsDir) {
+                      hints[name]+= "/" + item.scriptsDir;
+                  }
               }
           });
           Object.keys(hints)
@@ -115,7 +118,7 @@ function _ModuleCollector(promise, getScriptsDir, defaults, pathParser, nodePath
     entry.return = defaults.entry.module.return;
 
     //set the repositories to the required branches
-    var proc = type_module_checkoutRepositories(base, entry);
+    var proc = promise.resolve();
 
     //get the module file data
     proc = proc.then(function () {

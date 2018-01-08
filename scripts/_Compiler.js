@@ -30,7 +30,8 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
     , exec
     , start = performance.now();
 
-    compileReporter.info("++ Collection process starting");
+    compileReporter.info("Collection process starting");
+    compileReporter.group("collection");
 
     //if we passed then create the collect promise, otherwise we already rejected
     //loop through the manifest, run the collector for each
@@ -39,22 +40,25 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
         // repositories in the file system
         procs.forEach(function forEachProc(proc, indx) {
             if (!exec) {
-                exec = proc;
+                exec = proc();
             }
             else {
                 exec = exec.then(function (files) {
                     values.push(files);
-                    return proc;
+                    compileReporter.extended("Collector stopped");
+                    compileReporter.groupEnd("collect");
+                    return proc();
                 });
             }
         });
 
-        compileReporter.info("** Collection process running");
+        compileReporter.info("Collection process running");
 
         //after all of the collectors finish
         exec.then(function (results) {
-
-            compileReporter.info("-- Collection process finished (" + (performance.now() - start).toFixed(4) + "ms)");
+            compileReporter.groupEnd("collect");
+            compileReporter.groupEnd("collection");
+            compileReporter.info("Collection process finished (" + (performance.now() - start).toFixed(4) + "ms)");
 
             values.push(results);
             resolve(values);
@@ -77,10 +81,14 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
         return false;
       }
 
-      compileReporter.extended("** Collector found \"" + entry.type + "\"");
+      compileReporter.extended("Collector found \"" + entry.type + "\"");
 
       //run the collector to get a promise and add it to the procs array
-      procs.push(collector(base, entry, indx));
+      procs.push(function () {
+          compileReporter.extended("Collector started \"" + entry.type + "\"");
+          compileReporter.group("collect");
+          return collector(base, entry, indx);
+      });
 
       return true;
     }
@@ -120,7 +128,8 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
     var procs = []
     , start = performance.now();
 
-    compileReporter.info("++ Post collector process started");
+    compileReporter.info("Post collector process started");
+    compileReporter.group("postcollector");
 
     //chain together the pre-processor, assembler, formattor, and post-processor
     // for each entry in the manifest files array
@@ -138,7 +147,7 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
         //chain the pre processor
         if (!!preProcessor) {
 
-          compileReporter.extended("** Pre-Processor found for \"" + entry.type + "\"");
+          compileReporter.extended("Pre-Processor found for \"" + entry.type + "\"");
 
           chain = chain.then(function(files) {
             return preProcessor(entry, files, indx);
@@ -148,7 +157,7 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
         //chain the assembler
         if (!!assembler) {
 
-          compileReporter.extended("** Assembler found for \"" + entry.type + "\"");
+          compileReporter.extended("Assembler found for \"" + entry.type + "\"");
 
           chain = chain.then(function(files) {
             return assembler(entry, files, indx);
@@ -158,13 +167,15 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
         procs.push(chain);
     });
 
-    compileReporter.extended("** Post collector process running");
+    compileReporter.extended("Post collector process running");
+    compileReporter.group("postcollectorrunning");
 
     //wait for all entry processes
     promise.all(procs)
       .then(function(manifestFiles) {
-
-        compileReporter.info("-- Post collector process finished (" + (performance.now() - start).toFixed(4) + "ms)");
+        compileReporter.groupEnd("postcollectorrunning");
+        compileReporter.groupEnd("postcollector");
+        compileReporter.info("Post collector process finished (" + (performance.now() - start).toFixed(4) + "ms)");
 
         resolve(manifestFiles);
       })
@@ -181,7 +192,8 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
       var procs = []
       , start = performance.now();
 
-      compileReporter.info("++ Post assembler process started");
+      compileReporter.info("Post assembler process started");
+      compileReporter.group("postassembler");
 
       //chain together the pre-processor, assembler, formattor, and post-processor
       // for each entry in the manifest files array
@@ -195,7 +207,7 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
           //chain the formattor
           if (!!formatter) {
 
-            compileReporter.extended("** Formatter found for \"" + entry.type + "\"");
+            compileReporter.extended("Formatter found for \"" + entry.type + "\"");
 
             chain = chain.then(function(files) {
               return formatter(entry, files, indx);
@@ -205,7 +217,7 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
           //chain the post processor
           if (!!postProcessor) {
 
-            compileReporter.extended("** Post-Processor found for \"" + entry.type + "\"");
+            compileReporter.extended("Post-Processor found for \"" + entry.type + "\"");
 
             chain = chain.then(function(files) {
               return postProcessor(entry, files, indx);
@@ -215,13 +227,15 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
           procs.push(chain);
       });
 
-      compileReporter.extended("** Post assembler process running");
+      compileReporter.extended("Post assembler process running");
+      compileReporter.group("postassemblerrunning");
 
       //wait for all entry processes
       promise.all(procs)
         .then(function(manifestFiles) {
-
-          compileReporter.info("-- Post assembler process finished (" + (performance.now() - start).toFixed(4) + "ms)");
+          compileReporter.groupEnd("postassemblerrunning");
+          compileReporter.groupEnd("postassembler");
+          compileReporter.info("Post assembler process finished (" + (performance.now() - start).toFixed(4) + "ms)");
 
           resolve(manifestFiles);
         })

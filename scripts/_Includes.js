@@ -28,7 +28,7 @@ function _Includes(promise, isInteger, errors, compileReporter, performance) {
           indexes = getManifestIndexes(include, manifest);
           includeFiles = getIncludeFiles(indexes, manifestFiles);
 
-          compileReporter.extended("** Adding " + includeType + " includes from entry(s) \"" + indexes + "\" to entry \"" + indx + "\"");
+          compileReporter.extended("Adding " + includeType + " includes from entry(s) \"" + indexes + "\" to entry \"" + indx + "\"");
 
           //the post collector includes get inserted, while the rest are appended
           if (includeType === "postCollector") {
@@ -38,7 +38,7 @@ function _Includes(promise, isInteger, errors, compileReporter, performance) {
             files = files.concat(includeFiles);
           }
 
-          compileReporter.extended("** Added includes (" + (performance.now() - start).toFixed(4) + "ms)");
+          compileReporter.extended("Added includes (" + (performance.now() - start).toFixed(4) + "ms)");
 
           //update the container rather than the original manifestFiles
           //otherwise included files can have side effects, i.e. added multiple times

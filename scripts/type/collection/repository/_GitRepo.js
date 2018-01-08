@@ -47,6 +47,20 @@ function _GitRepo(promise, nodeFs, type_collection_gitDriver) {
                 }
             });
         });
+        //do a fetch to get any branches
+        proc = proc.then(function () {
+            var git = type_collection_gitDriver(basePath + "/" + repoObj.name);
+            return new promise(function (resolve, reject) {
+                git.fetch(function (err) {
+                    if (!!err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve();
+                    }
+                });
+            });
+        });
         //checkout the branch
         return proc.then(function () {
             return new promise(function (resolve, reject) {
