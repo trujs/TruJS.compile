@@ -5,38 +5,41 @@
 * the found files to the associated manifestFiles member.
 * @factory
 */
-function _Includes(promise, isInteger, errors) {
-  var cnsts = {
-    "include": "include"
-    , "postInclude": "postInclude"
-  };
+function _Includes(promise, isInteger, errors, compileReporter, performance) {
 
   /**
   * Adds the files for the includes
   * @function
   */
-  function addIncludes(resolve, reject, manifest, manifestFiles, post) {
-    var includeProp = !post && cnsts.include || cnsts.postInclude
-    , updatedManifestFiles = []; //the conatiner for the updated file arrays
+  function addIncludes(resolve, reject, manifest, manifestFiles, includeType) {
+    var updatedManifestFiles = []; //the conatiner for the updated file arrays
 
     try {
       //loop through the manifests, determine if there are includes, get any
       //include files, update the
       manifest.forEach(function forEachEntry(entry, indx) {
         var files = manifestFiles[indx]
-        , include = entry[includeProp]
-        , indexes, includeFiles;
+        , include = !!entry.includes ? entry.includes[includeType] : null
+        , indexes, includeFiles
+        , start = performance.now();
+
         //if there is an include property on the entry
         if (!isNill(include)) {
           indexes = getManifestIndexes(include, manifest);
           includeFiles = getIncludeFiles(indexes, manifestFiles);
-          //if this is a post includes we'll want to append not insert
-          if (!post) {
+
+          compileReporter.extended("** Adding " + includeType + " includes from entry(s) \"" + indexes + "\" to entry \"" + indx + "\"");
+
+          //the post collector includes get inserted, while the rest are appended
+          if (includeType === "postCollector") {
             files = includeFiles.concat(files);
           }
           else {
             files = files.concat(includeFiles);
           }
+
+          compileReporter.extended("** Added includes (" + (performance.now() - start).toFixed(4) + "ms)");
+
           //update the container rather than the original manifestFiles
           //otherwise included files can have side effects, i.e. added multiple times
           updatedManifestFiles[indx] = files;
@@ -49,6 +52,7 @@ function _Includes(promise, isInteger, errors) {
       resolve(updatedManifestFiles);
     }
     catch(ex) {
+      compileReporter.error(ex);
       reject(ex);
     }
   }
@@ -106,7 +110,7 @@ function _Includes(promise, isInteger, errors) {
     indexes.forEach(function forEachIndx(indx) {
       files = files.concat(manifestFiles[indx]);
     });
-    return files;
+    return copy(files);
   }
 
   /**

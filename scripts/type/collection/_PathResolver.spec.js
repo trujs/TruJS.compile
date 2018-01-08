@@ -8,13 +8,15 @@ function testPathResolver1(arrange, act, assert, module) {
     paths = undefined;
   });
 
-  act(function() {
+  act(function(done) {
     pathResolver(base, paths)
       .then(function (results) {
         res = results;
+        done();
       })
-      .catch(function (err) {
-        console.log(err);
+      .catch(function (error) {
+        err = error;
+        done();
       });
   });
 

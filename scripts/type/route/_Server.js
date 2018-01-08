@@ -275,6 +275,7 @@ function _Server(promise, $$server$$, $$routing$$_nodeExpress, $$routing$$_nodeH
           appList[key].server = nodeHttp.createServer(app);
         }
         //start listening
+        appList[key].instance =
         appList[key].server.listen(appConfig.port || appConfig.socket, appConfig.hostname, appConfig.backLog);
       });
 

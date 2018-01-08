@@ -44,7 +44,7 @@ function testNamer2(arrange, act, assert, module) {
     test("The naming object should be")
       .value(res)
       .stringify()
-      .equals("{\"root\":\"project\",\"$index\":0,\"$line\":0,\"name\":\"project.test.widgets._Test\",\"namespace\":\"project.test.widgets\"}");
+      .equals("{\"root\":\"project\",\"$index\":0,\"$line\":1,\"name\":\"project.test.widgets._Test\",\"namespace\":\"project.test.widgets\"}");
   });
 }
 
@@ -69,7 +69,7 @@ function testNamer3(arrange, act, assert, module) {
     test("The naming object should be")
       .value(res)
       .stringify()
-      .equals("{\"namespace\":\"totally.different\",\"$index\":0,\"$line\":0,\"name\":\"totally.different._Test\"}");
+      .equals("{\"namespace\":\"totally.different\",\"$index\":0,\"$line\":1,\"name\":\"totally.different._Test\"}");
   });
 }
 
@@ -119,7 +119,7 @@ function testNamer5(arrange, act, assert, module) {
     test("The naming object should be")
       .value(res)
       .stringify()
-      .equals("{\"skip\":true,\"namespace\":\"totally.different\",\"$index\":0,\"$line\":0}");
+      .equals("{\"skip\":true,\"namespace\":\"totally.different\",\"$index\":0,\"$line\":1}");
   });
 }
 

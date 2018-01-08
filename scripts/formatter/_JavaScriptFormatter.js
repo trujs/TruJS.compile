@@ -6,7 +6,7 @@
 * @factory
 */
 function _JavaScriptFormatter(getLineEnding, promise, errors, defaults) {
-  var LINE_PATT = /\r?\n/g
+  var LINE_PATT = /(\r?\n)/g
   ;
 
   /**
@@ -77,11 +77,11 @@ function _JavaScriptFormatter(getLineEnding, promise, errors, defaults) {
     }
 
     //wrap in iife
-    data = "(function (){" + lineEnding + data.replace(LINE_PATT, "$&\t") + lineEnding + "})();";
+    data = "(function (){" + lineEnding + data.replace(LINE_PATT, "$1\t") + lineEnding + "})();";
 
     //add namespace assignment
     if (!!entry.namespace) {
-      data = defaults[entry.format].global + "[\"" + entry.namespace + "\"] = " + data;
+      data = defaults.entry[entry.format].global + "[\"" + entry.namespace + "\"] = " + data;
     }
 
     return data;

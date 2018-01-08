@@ -1,4 +1,4 @@
-/**[@test({ "title": "TruJS.compile._Includes: multiple includes, not post include" })]*/
+/**[@test({ "title": "TruJS.compile._Includes: multiple includes" })]*/
 function testIncludes1(arrange, act, assert, module) {
   var includes, manifest, manifestFiles, res;
 
@@ -6,10 +6,14 @@ function testIncludes1(arrange, act, assert, module) {
     includes = module(["TruJS.compile._Includes", []]);
     manifest = [{
       "name": "entry1"
-      , "include": "1"
+      , "includes": {
+          "postCollector": "1"
+      }
     }, {
       "name": "entry2"
-      , "include": ["entry3", 0]
+      , "includes": {
+          "postCollector": ["entry3", 0]
+      }
     }, {
       "name": "entry3"
     }];
@@ -23,7 +27,7 @@ function testIncludes1(arrange, act, assert, module) {
   });
 
   act(function (done) {
-    includes(manifest, manifestFiles)
+    includes(manifest, manifestFiles, "postCollector")
       .then(function (results) {
         res = results;
         done();
@@ -64,7 +68,7 @@ function testIncludes1(arrange, act, assert, module) {
   });
 }
 
-/**[@test({ "title": "TruJS.compile._Includes: post include" })]*/
+/**[@test({ "title": "TruJS.compile._Includes: final include" })]*/
 function testIncludes2(arrange, act, assert, module) {
   var includes, manifest, manifestFiles, res;
 
@@ -72,10 +76,14 @@ function testIncludes2(arrange, act, assert, module) {
     includes = module(["TruJS.compile._Includes", []]);
     manifest = [{
       "name": "entry1"
-      , "postInclude": "1"
+      , "includes": {
+          "final": "1"
+      }
     }, {
       "name": "entry2"
-      , "include": ["entry3", 0]
+      , "includes": {
+          "postCollector": ["entry3", 0]
+      }
     }, {
       "name": "entry3"
     }];
@@ -89,7 +97,7 @@ function testIncludes2(arrange, act, assert, module) {
   });
 
   act(function (done) {
-    includes(manifest, manifestFiles, true)
+    includes(manifest, manifestFiles, "final")
       .then(function (results) {
         res = results;
         done();

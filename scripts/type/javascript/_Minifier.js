@@ -14,7 +14,7 @@ function _Minifier(promise, $container, defaults, errors) {
 
     //get the correct module
     var name = defaults.minifier.extentionMap[fileObj.ext]
-    , module = !!name && $container("type.javascript.minifiers." + name, "missing");
+    , module = !!name && $container(".type.javascript.minifiers." + name, "missing");
     if (module === "missing") {
       reject(new Error(errors.missingMinifierModule.replace("{ext}", fileObj.ext)));
     }

@@ -6,16 +6,29 @@
 function _TestAssembler(promise, getLineEnding, errors, defaults, nodePath, fileObj) {
 
   /**
+  * Uses the format and default test file name to construct a file name
+  * @function
+  */
+  function createFileName(entry) {
+    var name = !!entry.format && (entry.format + ".") || "";
+
+    if (name === "none.") {
+        name = "";
+    }
+
+    return name+= defaults.test.testFile;
+  }
+
+  /**
   * Creates one large file with the test objects stitched together
   * @function
   */
   function stitchTest(resolve, reject, entry, files) {
     var lineEnding = getLineEnding(files[0].data)
     , isErr
-    , path = nodePath.parse(entry.testFile || entry.output || defaults.testFile).base
+    , path = entry.testFile || createFileName(entry)
     , data = []
     ;
-
     //add a json object entry for each file
     files.forEach(function forEachFile(test) {
       if (!isErr) {
@@ -27,7 +40,7 @@ function _TestAssembler(promise, getLineEnding, errors, defaults, nodePath, file
         }
 
         //ensure there is a type
-        test.type = test.type || defaults.testType;
+        test.type = test.type || defaults.test.testType;
 
         //add the test object
         data.push(

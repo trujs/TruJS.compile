@@ -5,6 +5,8 @@
     , "nodePath": [":require(\"path\")"]
     , "nodeProcess": [":process"]
     , "nodeDirName": [":__dirname"]
+    , "global": [":global"]
+    , "performance": ["TruJS.timing._Performance", []]
     , "string": ["TruJS._String", []]
     , "stringTrim": [".string.trim"]
     , "stringToArray": [".string.toArray"]
@@ -16,8 +18,10 @@
     , "regEx": ["TruJS._RegEx", []]
     , "regExGetMatches": [".regEx.getMatches"]
     , "regExForEachMatch": [".regEx.forEachMatch"]
+    , "funcAsync": ["TruJS.func._Async",[]]
     , "number": ["TruJS._Number", []]
     , "isInteger": [".number.isInteger"]
+    , "funcInspector": ["TruJS.func._Inspector", []]
     , "utilities": ["TruJS.compile._Utilities", []]
     , "getLineEnding": [".utilities.getLineEnding", [], false]
     , "getScriptsDir": [".utilities.getScriptsDir", [], false]
@@ -29,9 +33,11 @@
     , "annotation": ["TruJS.compile._Annotation", []]
     , "namer": ["TruJS.compile._Namer", []]
     , "includes": ["TruJS.compile._Includes", []]
+    , "compileReporter": ["TruJS.log._Reporter", []]
     , "type": [{
         "collection": [{
-            "dirProcessor": ["TruJS.compile.type.collection._DirectoryProcessor", []]
+            "checkoutRepositories": ["TruJS.compile.type.collection._CheckoutRepositories", []]
+            , "dirProcessor": ["TruJS.compile.type.collection._DirectoryProcessor", []]
             , "pathProcessor": ["TruJS.compile.type.collection._PathProcessor", []]
             , "pathResultProcessor": ["TruJS.compile.type.collection._PathResultProcessor", []]
             , "pathResolver": ["TruJS.compile.type.collection._PathResolver", []]
@@ -51,10 +57,14 @@
         }]
         , "module": [{
             "iocEntry": ["TruJS.ioc._Entry", []]
-            , "moduleMerger": ["TruJS.compile.type.module._ModuleMerger", []]
+            , "checkoutRepositories": [".type.collection.checkoutRepositories"]
             , "moduleFileLoader": ["TruJS.compile.type.module._ModuleFileLoader", []]
-            , "moduleFileProcessor": ["TruJS.compile.type.module._ModuleFileProcessor", []]
+            , "moduleMerger": ["TruJS.compile.type.module._ModuleMerger", []]
+            , "filePicker": ["TruJS.compile.type.module._FilePicker", []]
+            , "extractFileDependencies": ["TruJS.compile.type.module._ExtractFileDependencies",[]]
             , "modulePathProcessor": ["TruJS.compile.type.module._ModulePathProcessor", []]
+            , "modulePathFinder": ["TruJS.compile.type.module._ModulePathFinder", []]
+            , "moduleFileProcessor": ["TruJS.compile.type.module._ModuleFileProcessor", []]
         }]
         , "route": [{
           "server": ["TruJS.compile.type.route._Server", [], false]
@@ -62,9 +72,6 @@
         }]
         , "sass": [{
             "sassRender": [":require('node-sass').render"]
-        }]
-        , "test": [{
-            "testIndex": ["TruJS.compile.type.test.indexHtml", [], false]
         }]
         , "view": [{
             "createView": ["TruJS.compile.type.view._CreateView", []]
@@ -110,7 +117,6 @@
         , "module": ["TruJS.compile.postProcessor._JavaScriptPostProcessor", []]
         , "sass": ["TruJS.compile.postProcessor._SassPostProcessor", []]
         , "routing": ["TruJS.compile.postProcessor._JavaScriptPostProcessor", []]
-        , "test": ["TruJS.compile.postProcessor._TestPostProcessor", []]
         , "view": ["TruJS.compile.postProcessor._JavaScriptPostProcessor", []]
     }]
     , "fileSaver": ["TruJS.compile._FilesSaver", []]

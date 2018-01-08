@@ -98,7 +98,6 @@ function testRun2(arrange, act, assert, callback, promise, module) {
         done();
       })
       .catch(function (err) {
-          console.log(err);
         res = err;
         done();
       });

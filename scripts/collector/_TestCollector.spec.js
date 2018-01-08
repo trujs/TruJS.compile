@@ -4,7 +4,7 @@ function testTestCollector1(arrange, act, assert, callback, module) {
 
   arrange(function () {
     collector_collection = callback();
-    testCollector = module(["TruJS.compile.collector._TestCollector", [collector_collection]]);
+    testCollector = module(["TruJS.compile.collector._TestCollector", [,collector_collection]]);
     base = "/base";
     entry = {};
 
@@ -40,7 +40,7 @@ function testTestCollector2(arrange, act, assert, callback, module) {
 
   arrange(function () {
     collector_collection = callback();
-    testCollector = module(["TruJS.compile.collector._TestCollector", [collector_collection]]);
+    testCollector = module(["TruJS.compile.collector._TestCollector", [,collector_collection]]);
     base = "/base";
     files = [];
     entry = {

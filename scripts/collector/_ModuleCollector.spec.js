@@ -1,19 +1,18 @@
 /**[@test({ "title": "TruJS.compile.collector._ModuleCollector: default module file, w/ files parameter" })]*/
 function testModuleCollector1(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, collector_collection, paths, moduleFileLoader, moduleFileProcessor, modulePathProcessor, base, entry, res;
+  var moduleCollector, checkoutRepositories, moduleFileLoader
+  , moduleMerger, filePicker, base, entry, res, err;
 
   arrange(function () {
-    paths = [
-      "/base/test1.js"
-      , "/base/test2.js"
-    ];
+    checkoutRepositories = callback(promise.resolve());
     moduleFileLoader = callback(promise.resolve());
-    moduleFileProcessor = callback(promise.resolve());
-    modulePathProcessor = callback(promise.resolve(paths));
-    collector_collection = callback(function (base, entry) {
-      return promise.resolve(entry.files);
-    });
-    moduleCollector = module(["TruJS.compile.collector._ModuleCollector", [, collector_collection, , , , moduleFileLoader, moduleFileProcessor, modulePathProcessor]]);
+    moduleMerger = callback(promise.resolve());
+    filePicker = callback(promise.resolve());
+
+    moduleCollector = module([
+        "TruJS.compile.collector._ModuleCollector"
+        , [, , , , , checkoutRepositories, moduleFileLoader, moduleMerger, filePicker]
+    ]);
     base = "/base";
     entry = {
       "files": [
@@ -29,249 +28,167 @@ function testModuleCollector1(arrange, act, assert, promise, callback, module) {
         res = results;
         done();
       })
+      .catch(function (error) {
+          err = error;
+          done();
+      });
   });
 
   assert(function (test) {
-    test("There should be 10 paths")
-      .value(res)
-      .hasMemberCountOf(10);
+    test("err should be undef")
+    .value(err)
+    .isUndef();
 
-    test("The 10th path should be")
-      .value(res, "[9]")
-      .equals("+./*js");
+    test("checkoutRepositories should be called once")
+    .value(checkoutRepositories)
+    .hasBeenCalled(1);
+
+    test("moduleFileLoader should be called once")
+    .value(moduleFileLoader)
+    .hasBeenCalled(1);
+
+    test("moduleFileLoader should be called with")
+    .value(moduleFileLoader)
+    .getCallbackArg(0, 0)
+    .matches(/[/\\]base[/\\]module[.]json/);
+
+    test("moduleMerger should be called once")
+    .value(moduleMerger)
+    .hasBeenCalled(1);
+
+    test("filePicker should be called once")
+    .value(filePicker)
+    .hasBeenCalled(1);
 
   });
 }
 
 /**[@test({ "title": "TruJS.compile.collector._ModuleCollector: moduleFile parameter" })]*/
 function testModuleCollector2(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, moduleFileLoader, moduleFileProcessor, base, entry;
+  var moduleCollector, checkoutRepositories, moduleFileLoader
+  , moduleMerger, filePicker, base, entry, res, err;
 
   arrange(function () {
-    moduleFileLoader = callback(function (path) {
-      return {};
-    });
-    moduleFileProcessor = callback(promise.reject());
-    moduleCollector = module(["TruJS.compile.collector._ModuleCollector", [, , , , , moduleFileLoader, moduleFileProcessor]]);
+    checkoutRepositories = callback(promise.resolve());
+    moduleFileLoader = callback(promise.resolve());
+    moduleMerger = callback(promise.resolve());
+    filePicker = callback(promise.resolve());
+
+    moduleCollector = module([
+        "TruJS.compile.collector._ModuleCollector"
+        , [, , , , , checkoutRepositories, moduleFileLoader, moduleMerger, filePicker]
+    ]);
     base = "/base";
     entry = {
-      "moduleFile": "other-module.json"
+      "files": [
+        "/base/test3.js"
+        , "+./*js"
+      ]
+      , "moduleFile": "server.module.json"
     };
   });
 
   act(function (done) {
     moduleCollector(base, entry)
-      .catch(function () {
+      .then(function (results) {
+        res = results;
         done();
+      })
+      .catch(function (error) {
+          err = error;
+          done();
       });
   });
 
   assert(function (test) {
+    test("err should be undef")
+    .value(err)
+    .isUndef();
+
     test("moduleFileLoader should be called with")
-      .run(moduleFileLoader.getArgs, [0])
-      .value("{value}", "[0]")
-      .matches(/[/\\]base[/\\]other-module.json/);
+    .value(moduleFileLoader)
+    .getCallbackArg(0, 0)
+    .matches(/[/\\]base[/\\]server[.]module[.]json/);
 
   });
 }
 
 /**[@test({ "title": "TruJS.compile.collector._ModuleCollector: baseModule parameter" })]*/
 function testModuleCollector3(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, moduleFileLoader, moduleFileProcessor, base, entry;
+  var moduleCollector, checkoutRepositories, modules, moduleFileLoader
+  , moduleMerger, filePicker, base, entry, res, err;
 
   arrange(function () {
-    moduleFileLoader = callback(function (path) {
-      if (moduleFileLoader.callbackCount === 1) {
-        return { "test1" : "test1.1", "test2": "test2" };
-      }
-      else {
-        return { "test1" : "test1.2", "test3": "test3" };
-      }
+    modules = [{"a":1},{"b":2},{"c":3}];
+    checkoutRepositories = callback(promise.resolve());
+    moduleFileLoader = callback(function () {
+        return promise.resolve(modules[moduleFileLoader.callbackCount - 1]);
     });
-    moduleFileProcessor = callback(promise.reject());
-    moduleCollector = module(["TruJS.compile.collector._ModuleCollector", [, , , , , moduleFileLoader, moduleFileProcessor]]);
+    moduleMerger = callback(promise.resolve());
+    filePicker = callback(promise.resolve());
+
+    moduleCollector = module([
+        "TruJS.compile.collector._ModuleCollector"
+        , [, , , , , checkoutRepositories, moduleFileLoader, moduleMerger, filePicker]
+    ]);
     base = "/base";
     entry = {
-      "baseModule": "{projects}/Other/other-module.json"
-    };
-  });
-
-  act(function (done) {
-    moduleCollector(base, entry)
-      .catch(function () {
-        done();
-      });
-  });
-
-  assert(function (test) {
-    test("moduleFileLoader should be called 2 times")
-      .value(moduleFileLoader)
-      .hasBeenCalled(2);
-
-    test("moduleFileProcessor 2nd arg should have 3 properties")
-      .run(moduleFileProcessor.getArgs, [0])
-      .value("{value}", "[1]")
-      .hasPropertyCountOf(3);
-
-    test("moduleFileProcessor 2nd arg \"test1\" property should be")
-      .run(moduleFileProcessor.getArgs, [0])
-      .value("{value}", "[1].test1")
-      .equals("test1.2");
-
-  });
-}
-
-/**[@test({ "title": "TruJS.compile.collector._ModuleCollector: multiple baseModule parameter, no file name" })]*/
-function testModuleCollector4(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, moduleFileLoader, moduleFileProcessor, base, entry;
-
-  arrange(function () {
-    moduleFileLoader = callback(function (path) {
-      if (moduleFileLoader.callbackCount === 1) {
-        return { "test1" : "test1.1", "test2": "test2" };
-      }
-      else {
-        return { "test1" : "test1.2", "test3": "test3" };
-      }
-    });
-    moduleFileProcessor = callback(promise.reject());
-    moduleCollector = module(["TruJS.compile.collector._ModuleCollector", [, , , , , moduleFileLoader, moduleFileProcessor]]);
-    base = "/base";
-    entry = {
-      "baseModule": [
-        "{projects}/Other.proj"
-        , "{projects}/Another/other-manifest.json"
+      "files": [
+        "/base/test3.js"
+        , "+./*js"
+      ]
+      , "baseModule": [
+          "{repos}/Test1/super.module.json"
+          ,"{projects}/Test2/base.module.json"
       ]
     };
   });
 
   act(function (done) {
     moduleCollector(base, entry)
-      .catch(function () {
+      .then(function (results) {
+        res = results;
         done();
+      })
+      .catch(function (error) {
+          err = error;
+          done();
       });
   });
 
   assert(function (test) {
+    test("err should be undef")
+    .value(err)
+    .isUndef();
+
+    test("checkoutRepositories should be called once")
+    .value(checkoutRepositories)
+    .hasBeenCalled(1);
+
+    test("moduleMerger should be called with")
+    .value(moduleMerger)
+    .getCallbackArg(0, 0)
+    .stringify()
+    .equals("[{\"a\":1},{\"b\":2},{\"c\":3}]");
+
     test("moduleFileLoader should be called 3 times")
-      .value(moduleFileLoader)
-      .hasBeenCalled(3);
+    .value(moduleFileLoader)
+    .hasBeenCalled(3);
 
-    test("moduleFileLoader 1st call should have path")
-      .run(moduleFileLoader.getArgs, [0])
-      .value("{value}", "[0]")
-      .endsWith("module.json");
+    test("moduleFileLoader should be called with")
+    .value(moduleFileLoader)
+    .getCallbackArg(0, 0)
+    .matches(/repos[/\\]Test1[/\\]super[.]module[.]json/);
 
-    test("moduleFileLoader 2nd call should have path")
-      .run(moduleFileLoader.getArgs, [1])
-      .value("{value}", "[0]")
-      .endsWith("other-manifest.json");
+    test("moduleFileLoader should be called with")
+    .value(moduleFileLoader)
+    .getCallbackArg(1, 0)
+    .matches(/projects[/\\]Test2[/\\]base[.]module[.]json/);
 
-    test("moduleFileLoader 3rd call should have path")
-      .run(moduleFileLoader.getArgs, [2])
-      .value("{value}", "[0]")
-      .endsWith("module.json");
-
-  });
-}
-
-/**[@test({ "title": "TruJS.compile.collector._ModuleCollector: module parameter" })]*/
-function testModuleCollector5(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, paths, curModule, entryModule, collector_collection, moduleFileLoader, moduleFileProcessor, modulePathProcessor, moduleMerger, base, entry, res;
-
-  arrange(function () {
-    paths = [
-      "/base/test1.js"
-      , "/base/test2.js"
-    ];
-    curModule = {};
-    entryModule = {
-      "test3": ["", []]
-    };
-    moduleFileLoader = callback(promise.resolve(curModule));
-    moduleMerger = callback({});
-    moduleFileProcessor = callback(promise.resolve());
-    modulePathProcessor = callback(promise.resolve(paths));
-    collector_collection = callback(promise.resolve());
-    moduleCollector = module(["TruJS.compile.collector._ModuleCollector", [, collector_collection, , , , moduleFileLoader, moduleFileProcessor, modulePathProcessor,,moduleMerger]]);
-    base = "/base";
-    entry = {
-      "module": entryModule
-    };
-  });
-
-  act(function (done) {
-    moduleCollector(base, entry)
-      .then(function (results) {
-        res = results;
-        done();
-      })
-  });
-
-  assert(function (test) {
-
-    test("The moduleMerger callback should be called with 2 module objects")
-      .run(moduleMerger.getArgs, [0])
-      .value("{value}", "[0]")
-      .hasMemberCountOf(2);
-
-    test("The moduleMerger 1st module object should be")
-      .run(moduleMerger.getArgs, [0])
-      .value("{value}", "[0][0]")
-      .equals(curModule);
-
-    test("The moduleMerger 2nd module object should be")
-      .run(moduleMerger.getArgs, [0])
-      .value("{value}", "[0][1]")
-      .equals(entryModule);
-
-  });
-}
-
-/**[@test({ "title": "TruJS.compile.collector._ModuleCollector: module parameter, empty string moduleFile parameter" })]*/
-function testModuleCollector6(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, paths, curModule, entryModule, collector_collection, moduleFileLoader, moduleFileProcessor, modulePathProcessor, moduleMerger, base, entry, res;
-
-  arrange(function () {
-    paths = [
-      "/base/test1.js"
-      , "/base/test2.js"
-    ];
-    curModule = {};
-    entryModule = {
-      "test3": ["", []]
-    };
-    moduleFileLoader = callback(promise.resolve(curModule));
-    moduleMerger = callback({});
-    moduleFileProcessor = callback(promise.resolve());
-    modulePathProcessor = callback(promise.resolve(paths));
-    collector_collection = callback(promise.resolve());
-    moduleCollector = module(["TruJS.compile.collector._ModuleCollector", [, collector_collection, , , , moduleFileLoader, moduleFileProcessor, modulePathProcessor,,moduleMerger]]);
-    base = "/base";
-    entry = {
-      "module": entryModule
-      , "moduleFile": ""
-    };
-  });
-
-  act(function (done) {
-    moduleCollector(base, entry)
-      .then(function (results) {
-        res = results;
-        done();
-      })
-  });
-
-  assert(function (test) {
-
-    test("The moduleFileLoader callback should not be called")
-      .value(moduleFileLoader)
-      .not()
-      .hasBeenCalled();
-
-    test("The moduleMerger callback should be called once")
-      .value(moduleMerger)
-      .hasBeenCalled(1);
+    test("moduleFileLoader should be called with")
+    .value(moduleFileLoader)
+    .getCallbackArg(2, 0)
+    .matches(/base[/\\]module[.]json/);
 
   });
 }

@@ -3,13 +3,15 @@
 * module object
 * @factory
 */
-function _ModuleFileProcessor(promise, nodePath, type_module_iocEntry, errors) {
+function _FileProcessor(promise, nodePath, type_module_iocEntry, errors) {
 
   /**
   * Uses the module to build a list of paths
   * @function
   */
-  function processModule(resolve, reject, entry, module) {
+  function processModule(resolve, reject, entry) {
+    var module = entry.module;
+
     //add the project's hint
     entry.hints = entry.hints || [];
     if (!entry.hints.hasOwnProperty(entry.name)) {
@@ -95,11 +97,11 @@ function _ModuleFileProcessor(promise, nodePath, type_module_iocEntry, errors) {
   /**
   * @worker
   */
-  return function ModuleFileProcessor(entry, module) {
+  return function FileProcessor(entry) {
 
     //process the module
     return new promise(function (resolve, reject) {
-      processModule(resolve, reject, entry, module);
+      processModule(resolve, reject, entry);
     })
 
   };

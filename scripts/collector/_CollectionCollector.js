@@ -16,53 +16,8 @@
 *
 * @factory
 */
-function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, getScriptsDir, errors, fileObj, defaults, type_collection_repository) {
-  var SEP_PATT = /[/\\]/;
+function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, getScriptsDir, errors, fileObj, defaults, type_collection_checkoutRepositories) {
 
-  /**
-  * Loops through the entry's repos property and checks out the branch's that
-  * are required for the
-  * @function
-  */
-  function checkoutRepositories(resolve, reject, base, entry) {
-      var procs = []
-      , repos = entry.repos || []
-      , basePath = getWorkspacePath(base)
-      ;
-
-      //create all of the repo processes
-      repos.forEach(function forEachRepo(repoObj) {
-          var type = repoObj.type || "git"
-          , dir = repoObj.isProject && "projects" || "repos"
-          , path = basePath + "/" + dir
-          , repo = type_collection_repository[type]
-          ;
-          procs.push(repo(path, repoObj));
-      });
-
-      //run all of the repo processes
-      promise.all(procs)
-      .then(function () {
-          resolve();
-      })
-      .catch(function (ex) {
-          reject(ex);
-      });
-  }
-  /**
-  * Extracts the workspace path from the base
-  * @function
-  */
-  function getWorkspacePath(base) {
-      var segs = base.split(SEP_PATT)
-      , indx = segs.indexOf("repos");
-
-      if (indx === -1) {
-          indx = segs.indexOf("projects");
-      }
-
-      return segs.slice(0, indx).join("/");
-  }
   /**
   * Resolves all relative paths in the entry's `files` array
   * @function
@@ -94,7 +49,7 @@ function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, get
       //ensure the files exists
       if (!pathObj.missing) {
         //read the file
-        nodeFs.readFile(pathObj.path, defaults.encoding[pathObj.ext] || null, function (err, data) {
+        nodeFs.readFile(pathObj.path, defaults.collector.encoding[pathObj.ext] || null, function (err, data) {
           readFileCb(err, data, pathObj, indx);
         });
       }
@@ -134,26 +89,19 @@ function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, get
   * @function
   */
   return function CollectionCollector(base, entry) {
-    //setup the path to the scripts, using the default or the manifest entry
-    var scriptsPath = getScriptsDir(base, entry)
-    , proc = promise.resolve();
 
-    //resolve the file paths for each member in the `files` array
-    if (isArray(entry.repos)) {
-        proc =  new Promise(function (resolve, reject) {
-            checkoutRepositories(resolve, reject, base, entry);
-        });
-    }
+    //set the repositories to the required branches
+    var proc = type_collection_checkoutRepositories(base, entry);
 
     //resolve the file paths for each member in the `files` array
     proc = proc.then(function () {
         return new Promise(function (resolve, reject) {
-          resolvePaths(resolve, reject, scriptsPath, entry);
+          resolvePaths(resolve, reject, getScriptsDir(base, entry), entry);
         });
     });
 
     //load the file data for each path
-    proc = proc.then(function (paths) {
+    return proc.then(function (paths) {
       if (paths.length > 0) {
         return new Promise(function (resolve, reject) {
           loadFileData(resolve, reject, paths);
@@ -163,7 +111,5 @@ function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, get
         return promise.resolve([]);
       }
     });
-
-    return proc;
   };
 }

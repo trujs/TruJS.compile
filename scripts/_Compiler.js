@@ -3,13 +3,8 @@
 * run the compiler logic and return a promise
 *
 * @factory
-* @function
-* @param {Promise} promise The Promise module
-* @param {object} $container The ioc container reference
-* @param {function} arrayFromArguments A function that transforms arguments to
-*   an array
 */
-function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
+function _Compiler(promise, $container, errors, includes, compileReporter, performance) {
 
   /**
   * Get the processing module by the entry `type` and process
@@ -32,7 +27,10 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
     //an array to store the collector promises
     var procs = []
     , values = []
-    , exec;
+    , exec
+    , start = performance.now();
+
+    compileReporter.info("++ Collection process starting");
 
     //if we passed then create the collect promise, otherwise we already rejected
     //loop through the manifest, run the collector for each
@@ -50,18 +48,25 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
                 });
             }
         });
+
+        compileReporter.info("** Collection process running");
+
         //after all of the collectors finish
         exec.then(function (results) {
+
+            compileReporter.info("-- Collection process finished (" + (performance.now() - start).toFixed(4) + "ms)");
+
             values.push(results);
             resolve(values);
         })
         .catch(function (err) {
+            compileReporter.error(err);
             reject(err);
         });
     }
 
     //iterator function for the manifest entries
-    function everyEntry(entry) {
+    function everyEntry(entry, indx) {
 
       //get the collector
       var collector = getModule(entry, "collector");
@@ -72,8 +77,10 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
         return false;
       }
 
+      compileReporter.extended("** Collector found \"" + entry.type + "\"");
+
       //run the collector to get a promise and add it to the procs array
-      procs.push(collector(base, entry));
+      procs.push(collector(base, entry, indx));
 
       return true;
     }
@@ -105,26 +112,60 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
       }
   }
   /**
-  * Runs the pre-processor, assembler, formattor, and the post-processor for
-  *   all manifest entries
+  * Runs the pre-processor and assembler for all manifest entries
   * @function
   */
-  function processEntries(resolve, reject, manifest, manifestFiles) {
+  function postCollectorProcess(resolve, reject, manifest, manifestFiles) {
     //an array of promises to wait for
-    var procs = [];
+    var procs = []
+    , start = performance.now();
+
+    compileReporter.info("++ Post collector process started");
 
     //chain together the pre-processor, assembler, formattor, and post-processor
     // for each entry in the manifest files array
     manifestFiles.forEach(function forEachFilesEntry(files, indx) {
         //get the entry for this data set
-        var entry = manifest[indx];
-        //chain the processes together
-        procs.push(chainProcesses(entry, files));
+        var entry = manifest[indx]
+        //start a promise to chain everything to
+        , chain = promise.resolve(files)
+        //get the modules for this entry
+        , preProcessor = getModule(entry, "preProcessor")
+        , assembler = getModule(entry, "assembler")
+        , start = performance.now();
+        ;
+
+        //chain the pre processor
+        if (!!preProcessor) {
+
+          compileReporter.extended("** Pre-Processor found for \"" + entry.type + "\"");
+
+          chain = chain.then(function(files) {
+            return preProcessor(entry, files, indx);
+          });
+        }
+
+        //chain the assembler
+        if (!!assembler) {
+
+          compileReporter.extended("** Assembler found for \"" + entry.type + "\"");
+
+          chain = chain.then(function(files) {
+            return assembler(entry, files, indx);
+          });
+        }
+
+        procs.push(chain);
     });
+
+    compileReporter.extended("** Post collector process running");
 
     //wait for all entry processes
     promise.all(procs)
       .then(function(manifestFiles) {
+
+        compileReporter.info("-- Post collector process finished (" + (performance.now() - start).toFixed(4) + "ms)");
+
         resolve(manifestFiles);
       })
       .catch(function (err) {
@@ -132,50 +173,61 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
       });
   }
   /**
-  * Chains together the pre-processor, assembler, formattor, and the
-  *   post-processor processes together for a single manifest entry
+  * Runs the formatter and post-processor for all manifest entries
   * @function
   */
-  function chainProcesses(entry, files) {
-    //start a promise to chain everything to
-    var proc = promise.resolve(files)
+  function postAssemblerProcess(resolve, reject, manifest, manifestFiles) {
+      //an array of promises to wait for
+      var procs = []
+      , start = performance.now();
 
-    //get the modules for this entry
-    , preProcessor = getModule(entry, "preProcessor")
-    , assembler = getModule(entry, "assembler")
-    , formatter = getModule(entry, "formatter")
-    , postProcessor = getModule(entry, "postProcessor")
-    ;
+      compileReporter.info("++ Post assembler process started");
 
-    //chain the pre processor
-    if (!!preProcessor) {
-      proc = proc.then(function(files) {
-        return preProcessor(entry, files);
+      //chain together the pre-processor, assembler, formattor, and post-processor
+      // for each entry in the manifest files array
+      manifestFiles.forEach(function forEachFilesEntry(files, indx) {
+          //get the entry for this data set
+          var entry = manifest[indx]
+          , chain = promise.resolve(files)
+          , formatter = getModule(entry, "formatter")
+          , postProcessor = getModule(entry, "postProcessor");
+
+          //chain the formattor
+          if (!!formatter) {
+
+            compileReporter.extended("** Formatter found for \"" + entry.type + "\"");
+
+            chain = chain.then(function(files) {
+              return formatter(entry, files, indx);
+            });
+          }
+
+          //chain the post processor
+          if (!!postProcessor) {
+
+            compileReporter.extended("** Post-Processor found for \"" + entry.type + "\"");
+
+            chain = chain.then(function(files) {
+              return postProcessor(entry, files, indx);
+            });
+          }
+
+          procs.push(chain);
       });
-    }
 
-    //chain the assembler
-    if (!!assembler) {
-      proc = proc.then(function(files) {
-        return assembler(entry, files);
-      });
-    }
+      compileReporter.extended("** Post assembler process running");
 
-    //chain the formattor
-    if (!!formatter) {
-      proc = proc.then(function(files) {
-        return formatter(entry, files);
-      });
-    }
+      //wait for all entry processes
+      promise.all(procs)
+        .then(function(manifestFiles) {
 
-    //chain the post processor
-    if (!!postProcessor) {
-      proc = proc.then(function(files) {
-        return postProcessor(entry, files);
-      });
-    }
+          compileReporter.info("-- Post assembler process finished (" + (performance.now() - start).toFixed(4) + "ms)");
 
-    return proc;
+          resolve(manifestFiles);
+        })
+        .catch(function (err) {
+          reject(err);
+        });
   }
 
   /**
@@ -191,11 +243,6 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
       collectFiles(resolve, reject, base, manifest);
     });
 
-    //update with the includes
-    proc = proc.then(function (manifestFiles) {
-      return includes(manifest, manifestFiles);
-    });
-
     //update the output path
     proc = proc.then(function (manifestFiles) {
       return new promise(function (resolve, reject) {
@@ -203,16 +250,33 @@ function _Compiler(promise, $container, arrayFromArguments, errors, includes) {
       });
     });
 
+    //update with the includes
+    proc = proc.then(function (manifestFiles) {
+      return includes(manifest, manifestFiles, "postCollector");
+    });
+
     //process the entries
     proc = proc.then(function (manifestFiles) {
       return new promise(function (resolve, reject) {
-        processEntries(resolve, reject, manifest, manifestFiles);
+        postCollectorProcess(resolve, reject, manifest, manifestFiles);
       });
     });
 
     //add the post include
     proc = proc.then(function (manifestFiles) {
-      return includes(manifest, manifestFiles, true);
+      return includes(manifest, manifestFiles, "postAssembler");
+    });
+
+    //process the entries
+    proc = proc.then(function (manifestFiles) {
+      return new promise(function (resolve, reject) {
+        postAssemblerProcess(resolve, reject, manifest, manifestFiles);
+      });
+    });
+
+    //add the post include
+    proc = proc.then(function (manifestFiles) {
+      return includes(manifest, manifestFiles, "final");
     });
 
     //combine the manifest file with the manifest and update the output path

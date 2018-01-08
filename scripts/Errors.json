@@ -12,4 +12,5 @@
   , "fileMissing": "[FileMissing] The file \"{path}\" does not exist."
   , "moduleEntryMismatch": "[ModuleEntryMismatch] The module entry types, at \"{key}\", to be merged are not of the same type."
   , "missingFileProperty": "[MissingFileProperty] The file object is missing the \"file\" property."
+  , "dependConflict": "[DependencyConflict] The dependency \"{key}\" fount in \"{path}\" is in conflict with a dependency of the same name on the module."
 }
