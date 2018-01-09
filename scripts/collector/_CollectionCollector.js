@@ -92,7 +92,7 @@ function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, get
     var proc = promise.resolve();
 
     //set the repositories to the required branches
-    if (entry.norepos) {
+    if (!entry.nocheckout) {
         proc = proc.then(function () {
             return type_collection_checkoutRepositories(base, entry);
         });
