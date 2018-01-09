@@ -1,0 +1,10 @@
+#!/bin/bash
+if [ "$2" == 'dev' ]
+then
+	node builds/TruJS.compile/cli.js --manifest $1 $2 $3 $4 $5 $6;
+elif [ "$2" == 'bin' ]
+then
+	node bin/TruJS.compile/cli.js --manifest $1 $2 $3 $4 $5 $6;
+else
+	node node_modules/trujs-compile/cli.js --manifest $1 $2 $3 $4 $5 $6;
+fi

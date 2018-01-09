@@ -51,6 +51,7 @@
 
           , "files": [
             "../cli.js"
+            , "../compile"
             , "../README.md"
           ]
 
