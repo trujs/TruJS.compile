@@ -1,17 +1,16 @@
 /**[@test({ "title": "TruJS.compile.collector._ModuleCollector: default module file, w/ files parameter" })]*/
 function testModuleCollector1(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, checkoutRepositories, moduleFileLoader
+  var moduleCollector, moduleFileLoader
   , moduleMerger, filePicker, base, entry, res, err;
 
   arrange(function () {
-    checkoutRepositories = callback(promise.resolve());
     moduleFileLoader = callback(promise.resolve());
     moduleMerger = callback(promise.resolve());
     filePicker = callback(promise.resolve());
 
     moduleCollector = module([
         "TruJS.compile.collector._ModuleCollector"
-        , [, , , , , checkoutRepositories, moduleFileLoader, moduleMerger, filePicker]
+        , [, , , , , moduleFileLoader, moduleMerger, filePicker]
     ]);
     base = "/base";
     entry = {
@@ -39,10 +38,6 @@ function testModuleCollector1(arrange, act, assert, promise, callback, module) {
     .value(err)
     .isUndef();
 
-    test("checkoutRepositories should be called once")
-    .value(checkoutRepositories)
-    .hasBeenCalled(1);
-
     test("moduleFileLoader should be called once")
     .value(moduleFileLoader)
     .hasBeenCalled(1);
@@ -65,7 +60,7 @@ function testModuleCollector1(arrange, act, assert, promise, callback, module) {
 
 /**[@test({ "title": "TruJS.compile.collector._ModuleCollector: moduleFile parameter" })]*/
 function testModuleCollector2(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, checkoutRepositories, moduleFileLoader
+  var moduleCollector, moduleFileLoader
   , moduleMerger, filePicker, base, entry, res, err;
 
   arrange(function () {
@@ -76,7 +71,7 @@ function testModuleCollector2(arrange, act, assert, promise, callback, module) {
 
     moduleCollector = module([
         "TruJS.compile.collector._ModuleCollector"
-        , [, , , , , checkoutRepositories, moduleFileLoader, moduleMerger, filePicker]
+        , [, , , , , moduleFileLoader, moduleMerger, filePicker]
     ]);
     base = "/base";
     entry = {
@@ -115,7 +110,7 @@ function testModuleCollector2(arrange, act, assert, promise, callback, module) {
 
 /**[@test({ "title": "TruJS.compile.collector._ModuleCollector: baseModule parameter" })]*/
 function testModuleCollector3(arrange, act, assert, promise, callback, module) {
-  var moduleCollector, checkoutRepositories, modules, moduleFileLoader
+  var moduleCollector, modules, moduleFileLoader
   , moduleMerger, filePicker, base, entry, res, err;
 
   arrange(function () {
@@ -129,7 +124,7 @@ function testModuleCollector3(arrange, act, assert, promise, callback, module) {
 
     moduleCollector = module([
         "TruJS.compile.collector._ModuleCollector"
-        , [, , , , , checkoutRepositories, moduleFileLoader, moduleMerger, filePicker]
+        , [, , , , , moduleFileLoader, moduleMerger, filePicker]
     ]);
     base = "/base";
     entry = {
@@ -160,10 +155,6 @@ function testModuleCollector3(arrange, act, assert, promise, callback, module) {
     test("err should be undef")
     .value(err)
     .isUndef();
-
-    test("checkoutRepositories should be called once")
-    .value(checkoutRepositories)
-    .hasBeenCalled(1);
 
     test("moduleMerger should be called with")
     .value(moduleMerger)
