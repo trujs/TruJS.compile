@@ -25,7 +25,10 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
       , "entry": entry
     }
     ;
-
+    //set the repo tag
+    if (cmdArgs.repos === "false") {
+        entry.norepos = true;
+    }
     resolve(settings);
   }
   /**
