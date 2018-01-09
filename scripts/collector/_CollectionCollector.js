@@ -89,9 +89,14 @@ function _CollectionCollector(promise, nodeFs, type_collection_pathResolver, get
   * @function
   */
   return function CollectionCollector(base, entry) {
+    var proc = promise.resolve();
 
     //set the repositories to the required branches
-    var proc = type_collection_checkoutRepositories(base, entry);
+    if (entry.norepos) {
+        proc = proc.then(function () {
+            return type_collection_checkoutRepositories(base, entry);
+        });
+    }
 
     //resolve the file paths for each member in the `files` array
     proc = proc.then(function () {
