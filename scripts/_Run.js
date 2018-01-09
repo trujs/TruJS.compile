@@ -25,10 +25,7 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
       , "entry": entry
     }
     ;
-    //set the repo tag
-    if (cmdArgs.repos === "false") {
-        entry.norepos = true;
-    }
+
     resolve(settings);
   }
   /**
@@ -134,6 +131,22 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
 
     resolve(settings);
   }
+  /**
+  * Updates the manifest entries with certain cmd line args
+  * @function
+  */
+  function updateManifest(resolve, reject, settings, cmdArgs) {
+      try {
+          settings.manifest.forEach(function (entry) {
+             entry.nocheckout = cmdArgs.checkout === "false" || false;
+          });
+
+          resolve(settings);
+      }
+      catch(ex) {
+          reject(ex);
+      }
+  }
 
   /**
   * @worker
@@ -157,6 +170,13 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
       return new promise(function (resolve, reject) {
         filterManifest(resolve, reject, settings);
       });
+    });
+
+    //update manifest entries
+    proc = proc.then(function (settings) {
+        return new promise(function (resolve, reject) {
+          updateManifest(resolve, reject, settings, cmdArgs);
+        });
     });
 
     //execute the compiler
