@@ -7,7 +7,7 @@
 *   files: {optional array of file paths to be appended to the output file list}
 * @factory
 */
-function _ModuleCollector(promise, getScriptsDir, defaults, pathParser, nodePath, type_module_checkoutRepositories, type_module_moduleFileLoader, type_module_moduleMerger, type_module_filePicker) {
+function _ModuleCollector(promise, getScriptsDir, defaults, pathParser, nodePath, type_module_moduleFileLoader, type_module_moduleMerger, type_module_filePicker) {
   var cnsts = {
     "module": "module.json"
   };
