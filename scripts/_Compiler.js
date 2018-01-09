@@ -45,18 +45,17 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
             else {
                 exec = exec.then(function (files) {
                     values.push(files);
-                    compileReporter.extended("Collector stopped");
                     compileReporter.groupEnd("collect");
+                    compileReporter.extended("Collector stopped");
                     return proc();
                 });
             }
         });
 
-        compileReporter.info("Collection process running");
-
         //after all of the collectors finish
         exec.then(function (results) {
             compileReporter.groupEnd("collect");
+            compileReporter.extended("Collector stopped");
             compileReporter.groupEnd("collection");
             compileReporter.info("Collection process finished (" + (performance.now() - start).toFixed(4) + "ms)");
 

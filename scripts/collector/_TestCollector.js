@@ -10,7 +10,7 @@ function _TestCollector(promise, collector_collection, defaults) {
   */
   return function TestCollector(base, entry, indx) {
     //by default we'll add the TruJS base and all spec.js file recursively
-    update(entry, defaults.entry.test);
+    update(entry, copy(defaults.entry.test));
 
     //the default test entry is the entry's previous sibling
     if (!entry.testEntry) {
