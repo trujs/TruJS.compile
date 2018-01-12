@@ -6,7 +6,8 @@
 * @factory
 */
 function _ExtractFileDependencies(promise, errors, annotation) {
-    var cnsts = {
+    var LD_PATT = /_/g
+    , cnsts = {
         "annotationName": "dependencies"
     };
 
@@ -57,13 +58,13 @@ function _ExtractFileDependencies(promise, errors, annotation) {
             var module = {};
 
             fileDependObj.forEach(function forEachDepend(fileDependObj) {
-                var path = filDependObj.path
-                , dependencies = filDependObj.dependencies;
+                var path = fileDependObj.path
+                , dependencies = fileDependObj.dependencies;
 
                 //check each dependency on the filDependObj.dependencies
                 Object.keys(dependencies)
                 .forEach(function forEachFdo(key) {
-                    var dependEntry = filDependObj.dependencies[key]
+                    var dependEntry = fileDependObj.dependencies[key]
                     , existEntry = getEntry(key, entry.module)
                         || getEntry(key, module);
                     if (!existEntry) {
