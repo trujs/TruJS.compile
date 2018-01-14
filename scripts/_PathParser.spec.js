@@ -1,6 +1,7 @@
 /**[@test( { "title": "TruJS.compile._PathParser: Test all special tags" } )]*/
 function testPathParser1(arrange, act, assert, callback, module) {
-  var nodeDirname, nodeProcess, pathParser, base, path1, path2, path3, path4, path5, path6, res1, res2, res3, res4, res5, res6;
+  var nodeDirname, nodeProcess, pathParser, base, path1, path2, path3, path4
+  , path5, path6, path7, res1, res2, res3, res4, res5, res6, res7;
 
   arrange(function() {
     nodeDirname = "/dirname";
@@ -15,6 +16,7 @@ function testPathParser1(arrange, act, assert, callback, module) {
     path4 = "{projects}/path4";
     path5 = "path5";
     path6 = "path6";
+    path7 = "{resources}/path7";
   });
 
   act(function() {
@@ -24,6 +26,7 @@ function testPathParser1(arrange, act, assert, callback, module) {
     res4 = pathParser(base, path4);
     res5 = pathParser(null, path5);
     res6 = pathParser(base, path6);
+    res7 = pathParser(base, path7);
   });
 
   assert(function(test) {
@@ -50,6 +53,10 @@ function testPathParser1(arrange, act, assert, callback, module) {
     test("res6 should be")
       .value(res6, "path")
       .matches(/[/\\]base[/\\]path6/);
+
+    test("res6 should be")
+      .value(res7, "path")
+      .matches(/[/\\]cwd[/\\]resources[/\\]path7/);
 
   });
 }
