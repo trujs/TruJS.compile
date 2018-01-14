@@ -114,7 +114,7 @@ function _PathResultProcessor(nodePath, regExGetMatches, stringTrim) {
       //add the file to the array if it's nat already a member
       if (missingFile(files, file)) {
         nameObj = nodePath.parse(name);
-        files.push({ "path": file, "root": root, "dir": dir, "file": fileObj.base, "name": nameObj.name, "ext": nameObj.ext, "fragment": fragment });
+        files.push({ "path": file, "root": root, "dir": dir, "file": fileObj.base, "name": nameObj.name, "ext": nameObj.ext, "fragment": fragment, "dest": pathObj.dest });
       }
     });
 
@@ -195,7 +195,7 @@ function _PathResultProcessor(nodePath, regExGetMatches, stringTrim) {
         filterFiles(procFiles, result, matcher);
       }
       else if (missingFile(files, result.path)) {
-        procFiles.push({ "path": result.path, "fragment": result.fragment, "root": result.root, "dir": result.dir, "file": result.base, "name": result.name, "ext": result.ext });
+        procFiles.push({ "path": result.path, "fragment": result.fragment, "dest": result.dest, "root": result.root, "dir": result.dir, "file": result.base, "name": result.name, "ext": result.ext });
       }
     }
     //if not an object then we are expecting a path string
