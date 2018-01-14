@@ -6,8 +6,10 @@ function _PathProcessor(nodePath, pathParser) {
   var cnsts = {
     "minus": "-"
     , "plus": "+"
+    , "frag": "^"
   }
-  , SEP_PATT = /[\/\\]/g;
+  , SEP_PATT = /[\/\\]/g
+  , FRAG_PATT = /[\^]/g;
 
   /**
   * Inspects the path to see what it is and returns an object describing it
@@ -99,6 +101,15 @@ function _PathProcessor(nodePath, pathParser) {
         pathObj.options.recurse = true;
         pathObj.fragment = pathObj.dir.substring(pathObj.dir.indexOf("*"));
         pathObj.path = pathObj.dir = pathObj.dir.substring(0, pathObj.dir.indexOf("*"));
+    }
+
+    //if there is a ^ in the dir then we need to set the fragment
+    if (pathObj.dir.indexOf("^") !== -1) {
+        pathObj.dest = pathObj.dir.substring(pathObj.dir.indexOf("^") + 1);
+        pathObj.path = pathObj.dir = pathObj.dir.replace(FRAG_PATT, "");
+        if (pathObj.base !== "*") {
+            pathObj.path = pathObj.dir + "/" + pathObj.base;
+        }
     }
 
     //if this is recursive and no wildcard then make one
