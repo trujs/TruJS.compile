@@ -10,6 +10,7 @@
 *
 *   Qualifying:
 *     ./ => the base
+*     ../ => back
 *
 * @factory
 * @function
@@ -21,12 +22,13 @@ function _PathParser(nodePath, nodeProcess, nodeDirName) {
     , "root": nodeProcess.cwd()
     , "repos": nodePath.join(nodeProcess.cwd(), "repos")
     , "projects": nodePath.join(nodeProcess.cwd(), "projects")
+    , "resources": nodePath.join(nodeProcess.cwd(), "resources")
   }
   , cnsts = {
     "base": "./"
     , "back": "../"
   }
-  , TAG_PATT = /{([^}]+)}/g
+  , TAG_PATT = /[*\^]?{([^}]+)}/g
   ;
 
   /**
@@ -46,7 +48,14 @@ function _PathParser(nodePath, nodeProcess, nodeDirName) {
 
     //replace the tags
     curPath = curPath.replace(TAG_PATT, function(tag, name) {
-      return tags[name];
+      var val = tags[name];
+      if (tag.indexOf("*") === 0) {
+          val = val.replace(name, "*" + name);
+      }
+      if (tag.indexOf("^") === 0) {
+          val = val.replace(name, "^" + name);
+      }
+      return val;
     });
 
     //make this an absolute path

@@ -75,12 +75,17 @@ function _FilesSaver(nodeFs, nodePath, promise, errors) {
   * @function
   */
   function createFilePath(filePath, fileObj) {
-    //see if there was a fragment
-    var fragment = fileObj.fragment;
+    var fragment = fileObj.fragment
+    , dest = fileObj.dest;
 
     //if there is a fragment, add it to the end of the path
     if (!!fragment) {
       filePath = nodePath.join(filePath, fragment);
+    }
+
+    //if there is a destination add that
+    if (!!dest) {
+      filePath = nodePath.join(filePath, dest);
     }
 
     //if there isn't a file name then add it
