@@ -39,9 +39,6 @@ compileReporter.group("compiler");
 
 //run the compiler
 run(cmdArgs)
-  .then(function(manifest) {
-    return saver(manifest);
-  })
   .then(function () {
     compileReporter.groupEnd("compiler");
     compileReporter.info("Finished Processing");
