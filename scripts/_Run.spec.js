@@ -93,7 +93,7 @@ function testRun2(arrange, act, assert, callback, promise, module) {
 
   act(function (done) {
     run(cmdArgs)
-      .then(function (results) {
+      .then(function (results) { 
         res = results;
         done();
       })
@@ -107,7 +107,7 @@ function testRun2(arrange, act, assert, callback, promise, module) {
     test("The res should not be an error")
       .value(res)
       .not()
-      .isError();
+      .isError();console.log(res);
 
     test("The nodeFs.readFile callback should be called with the path")
       .value(nodeFs, "readFile")

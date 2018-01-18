@@ -4,12 +4,53 @@
 * runs the compiler
 * @factory
 */
-function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodeProcess, getEntryArg) {
+function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodeProcess, getEntryArg, compileReporter, pathParser, saver) {
   var cnsts = {
     "manifest": "manifest.json"
     , "manifestDir": "{script}/manifest.json"
   };
 
+  /**
+  * Runs the compile operation
+  * @function
+  */
+  function start(cmdArgs) {
+      //parse the command args
+      var proc = new promise(function (resolve, reject) {
+        processArgs(resolve, reject, cmdArgs);
+      });
+
+      //load the manifest file
+      proc = proc.then(function (settings) {
+        return new promise(function (resolve, reject) {
+          loadManifestFile(resolve, reject, settings);
+        });
+      });
+
+      //filter manifest
+      proc = proc.then(function (settings) {
+        return new promise(function (resolve, reject) {
+          filterManifest(resolve, reject, settings);
+        });
+      });
+
+      //update manifest entries
+      proc = proc.then(function (settings) {
+          return new promise(function (resolve, reject) {
+            updateManifest(resolve, reject, settings, cmdArgs);
+          });
+      });
+
+      //execute the compiler
+      proc = proc.then(function (settings) {
+        return compiler(settings.basePath, settings.manifest);
+      });
+
+      //save the files
+      return proc.then(function (manifest) {
+         return saver(manifest);
+      });
+  }
   /**
   * Uses the command line arguments to determine the base and manifest paths and
   * then loads the
@@ -153,36 +194,55 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
   */
   return function Run(cmdArgs) {
 
-    //parse the command args
-    var proc = new promise(function (resolve, reject) {
-      processArgs(resolve, reject, cmdArgs);
-    });
-
-    //load the manifest file
-    proc = proc.then(function (settings) {
       return new promise(function (resolve, reject) {
-        loadManifestFile(resolve, reject, settings);
+          try {
+              var watch = cmdArgs.hasOwnProperty("watch"), watcher
+              , path = pathParser(cmdArgs.manifest).path + "/"
+              , running = true;
+
+              //setup the watcher
+              if (watch) {
+                  compileReporter.report("seperator","");
+                  compileReporter.info("Starting the compile file watcher");
+                  compileReporter.report("seperator","");
+
+                  watcher =
+                  nodeFs.watch(path, { "recursive": true }, function () {
+                      if (!running) {
+                          running = true;
+                          compileReporter.info("Change detected, starting compiler");
+                          compileReporter.report("seperator","");
+                          //give the files system time to catch up
+                          setTimeout(execute, 1000);
+                      }
+                  });
+              }
+
+              execute();
+
+              //executes the compile operation
+              function execute() {
+                  start(cmdArgs)
+                  .then(function (results) {
+                      running = false;
+                      if (!watch) {
+                          resolve(results);
+                      }
+                      else {
+                          compileReporter.report("seperator","");
+                          compileReporter.info("Listening for file changes");
+                      }
+                  })
+                  .catch(function (error) {
+                      reject(error);
+                  });
+              }
+
+          }
+          catch(ex) {
+            reject(ex);
+          }
       });
-    });
-
-    //filter manifest
-    proc = proc.then(function (settings) {
-      return new promise(function (resolve, reject) {
-        filterManifest(resolve, reject, settings);
-      });
-    });
-
-    //update manifest entries
-    proc = proc.then(function (settings) {
-        return new promise(function (resolve, reject) {
-          updateManifest(resolve, reject, settings, cmdArgs);
-        });
-    });
-
-    //execute the compiler
-    return proc.then(function (settings) {
-      return compiler(settings.basePath, settings.manifest);
-    });
 
   };
 }
