@@ -197,7 +197,7 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
       return new promise(function (resolve, reject) {
           try {
               var watch = cmdArgs.hasOwnProperty("watch"), watcher
-              , path = pathParser(cmdArgs.manifest).path + "/"
+              , path = !!cmdArgs.manifest && pathParser(cmdArgs.manifest).path + "/"
               , running = true;
 
               //setup the watcher
