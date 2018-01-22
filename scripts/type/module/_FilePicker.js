@@ -29,14 +29,14 @@ function _FilePicker(promise, getScriptsDir, collector_collection, type_module_m
         //inspect the files for dependencies
         proc = proc.then(function (results) {
             files = results;
-            return type_module_extractFileDependencies(base, entry, files);
+            return type_module_extractFileDependencies(entry.module, files);
         });
 
         //run the picker for the found dependencies
         proc = proc.then(function (tempModule) {
             if (!isEmpty(tempModule)) {
                 var tempEntry = copy(entry);
-                tempEntry.module = tempModule;
+                tempEntry.module = apply(tempModule, entry.module);
                 return worker(base, tempEntry);
             }
             else {

@@ -5,7 +5,7 @@
 * returns a temp module entry
 * @factory
 */
-function _ExtractFileDependencies(promise, errors, annotation) {
+function _ExtractFileDependencies(promise, errors, annotation, compileReporter) {
     var LD_PATT = /_/g
     , cnsts = {
         "annotationName": "dependencies"
@@ -15,28 +15,25 @@ function _ExtractFileDependencies(promise, errors, annotation) {
     * Checks the files for depenedency annotations and builds a list of them
     * @function
     */
-    function extractAnnotations(resolve, reject, files) {
+    function extractDependencies(resolve, reject, module, files) {
         try {
-            var fileDependObjs = [];
+            var newModule = {};
 
             files.forEach(function forEachFile(file) {
                 var depends = extractFileAnnotation(file);
                 if (!!depends) {
-                    fileDependObjs.push({
-                        "path": file.path
-                        , "dependencies": depends
-                    });
+                    addModuleEntries(module, newModule, file.path, depends);
                 }
             });
 
-            resolve(fileDependObjs);
+            resolve(newModule);
         }
         catch(ex) {
             reject(ex);
         }
     }
     /**
-    *
+    * Extracts the file's dependency annotation
     * @function
     */
     function extractFileAnnotation(file) {
@@ -48,43 +45,34 @@ function _ExtractFileDependencies(promise, errors, annotation) {
         }
         return depends;
     }
-
     /**
-    * Filters out any dependencies that already exist or are duplicates
+    * Checks to see if the depends exist in the current module, if not it adds
+    * them to the new module, if so, checks to see if the definitions conflit
     * @function
     */
-    function createModule(resolve, reject, entry, fileDependObj) {
-        try {
-            var module = {};
-
-            fileDependObj.forEach(function forEachDepend(fileDependObj) {
-                var path = fileDependObj.path
-                , dependencies = fileDependObj.dependencies;
-
-                //check each dependency on the filDependObj.dependencies
-                Object.keys(dependencies)
-                .forEach(function forEachFdo(key) {
-                    var dependEntry = fileDependObj.dependencies[key]
-                    , existEntry = getEntry(key, entry.module)
-                        || getEntry(key, module);
-                    if (!existEntry) {
-                        addEntry(key, dependEntry, module);
-                    }
-                    else if (JSON.stringify(existEntry) !== JSON.stringify(dependEntry)) {
-                        throw new Error(
-                            errors.dependConflict
-                            .replace("{key}", "key")
-                            .replace("{path}", "path")
-                        );
-                    }
-                });
-            });
-
-            resolve(module);
-        }
-        catch(ex) {
-            reject(ex);
-        }
+    function addModuleEntries(curModule, newModule, path, dependencies) {
+        Object.keys(dependencies)
+        .forEach(function forEachDepend(key) {
+            var dependEntry = dependencies[key]
+            , moduleEntry;
+            //add the entry to the new module
+            if (!(moduleEntry = getEntry(key, newModule))) {
+                if (!(moduleEntry = getEntry(key, curModule))) {
+                    addEntry(key, dependEntry, newModule);
+                }
+            }
+            //if we have a module entry here, it already exists, see if it
+            //conflicts
+            if (!!moduleEntry) {
+                if (JSON.stringify(moduleEntry) !== JSON.stringify(dependEntry)) {
+                    throw new Error(
+                        errors.dependConflict
+                        .replace("{key}", "key")
+                        .replace("{path}", "path")
+                    );
+                }
+            }
+        });
     }
     /**
     * Looks for the path in the module, returning the entry if found, creating
@@ -148,18 +136,11 @@ function _ExtractFileDependencies(promise, errors, annotation) {
     /**
     * @worker
     */
-    return function ExtractFileDependencies(base, entry, files) {
+    return function ExtractFileDependencies(module, files) {
 
         //get the dependency annotation and parameters for each file
-        var proc = new promise(function (resolve, reject) {
-            extractAnnotations(resolve, reject, files);
-        });
-
-        //remove any of the dependencies that exist already
-        return proc.then(function (dependencies) {
-            return new promise(function (resolve, reject) {
-                createModule(resolve, reject, entry, dependencies);
-            });
+        return new promise(function (resolve, reject) {
+            extractDependencies(resolve, reject, module, files);
         });
 
     };
