@@ -1,6 +1,7 @@
 /**[@test({ "title": "TruJS.compile._Run: pass correct base and manifest paths " })]*/
 function testRun1(arrange, act, assert, callback, promise, module) {
-  var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, res, manifestPath;
+  var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, res
+  , manifestPath, saver;
 
   arrange(function () {
     data = "[{ \"name\": \"value\" }]";
@@ -18,7 +19,8 @@ function testRun1(arrange, act, assert, callback, promise, module) {
         "manifestFile": "manifest.json"
       }
     };
-    run = module(["TruJS.compile._Run", [, nodeFs,, compiler, defaults]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs,, compiler, defaults, , , , , , saver]]);
     cmdArgs = {
       "base": "/base"
       , "manifest": "path1"
@@ -66,7 +68,8 @@ function testRun1(arrange, act, assert, callback, promise, module) {
 
 /**[@test({ "title": "TruJS.compile._Run: no manifest path" })]*/
 function testRun2(arrange, act, assert, callback, promise, module) {
-  var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, res, manifestPath;
+  var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, res
+  , manifestPath, saver;
 
   arrange(function () {
     data = "[{ \"name\": \"value\" }]";
@@ -84,7 +87,8 @@ function testRun2(arrange, act, assert, callback, promise, module) {
         "manifestDir": "/base/manifest.json"
       }
     };
-    run = module(["TruJS.compile._Run", [, nodeFs,, compiler, defaults]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs,, compiler, defaults, , , , , , saver]]);
     cmdArgs = {
       "base": "/base"
     };
@@ -93,7 +97,7 @@ function testRun2(arrange, act, assert, callback, promise, module) {
 
   act(function (done) {
     run(cmdArgs)
-      .then(function (results) { 
+      .then(function (results) {
         res = results;
         done();
       })
@@ -107,7 +111,7 @@ function testRun2(arrange, act, assert, callback, promise, module) {
     test("The res should not be an error")
       .value(res)
       .not()
-      .isError();console.log(res);
+      .isError();
 
     test("The nodeFs.readFile callback should be called with the path")
       .value(nodeFs, "readFile")
@@ -117,8 +121,8 @@ function testRun2(arrange, act, assert, callback, promise, module) {
 }
 
 /**[@test({ "title": "TruJS.compile._Run: error reading manifest file" })]*/
-function testRun3(arrange, act, assert, callback, module) {
-  var nodeFs, compiler, run, cmdArgs, res;
+function testRun3(arrange, act, assert, callback, promise, module) {
+  var nodeFs, compiler, run, cmdArgs, res, saver;
 
   arrange(function () {
     nodeFs = {
@@ -126,7 +130,8 @@ function testRun3(arrange, act, assert, callback, module) {
         cb(new Error("fake error"));
       })
     };
-    run = module(["TruJS.compile._Run", [, nodeFs]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs, , , , , , , , , saver]]);
     cmdArgs = {
       "base": "/base"
       , "manifest": "/base/path1"
@@ -154,8 +159,8 @@ function testRun3(arrange, act, assert, callback, module) {
 }
 
 /**[@test({ "title": "TruJS.compile._Run: bad manifest json data" })]*/
-function testRun4(arrange, act, assert, callback, module) {
-  var defaults, data, nodeFs, compiler, run, cmdArgs, res, manifestPath;
+function testRun4(arrange, act, assert, callback, promise, module) {
+  var defaults, data, nodeFs, compiler, run, cmdArgs, res, manifestPath, saver;
 
   arrange(function () {
     data = "[{ \"name\": \"value\" ";
@@ -164,7 +169,8 @@ function testRun4(arrange, act, assert, callback, module) {
         cb(null, data);
       })
     };
-    run = module(["TruJS.compile._Run", [, nodeFs]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs, , , , , , , , , saver]]);
     cmdArgs = {
       "base": "/base"
       , "manifest": "/base/path1"
@@ -193,8 +199,9 @@ function testRun4(arrange, act, assert, callback, module) {
 }
 
 /**[@test({ "title": "TruJS.compile._Run: try all special path tags" })]*/
-function testRun5(arrange, act, assert, callback, module) {
-  var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, cnt, nodeDirName, nodeProcess, manifestPaths, finished;
+function testRun5(arrange, act, assert, callback, promise, module) {
+  var defaults, data, nodeFs, nodePath, compiler, run, cmdArgs, cnt, nodeDirName
+  , nodeProcess, manifestPaths, finished, saver;
 
   arrange(function () {
     data = "[{ \"name\": \"value\" }]";
@@ -209,7 +216,8 @@ function testRun5(arrange, act, assert, callback, module) {
     nodeProcess = {
       "cwd": callback("/cwd")
     }
-    run = module(["TruJS.compile._Run", [, nodeFs, , compiler, , nodeDirName, nodeProcess]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs, , compiler, , nodeDirName, nodeProcess, , , , saver]]);
     cmdArgs = [{
       "manifest": "{script}/path1/manifest.json"
     }, {
@@ -263,8 +271,8 @@ function testRun5(arrange, act, assert, callback, module) {
 }
 
 /**[@test({ "title": "TruJS.compile._Run: missing base, defaults to manifestPath" })]*/
-function testRun6(arrange, act, assert, callback, module) {
-  var data, nodeFs, nodePath, compiler, run, cmdArgs, res, manifestPath;
+function testRun6(arrange, act, assert, callback, promise, module) {
+  var data, nodeFs, nodePath, compiler, run, cmdArgs, res, manifestPath, saver;
 
   arrange(function () {
     data = "[{ \"name\": \"value\" }]";
@@ -275,7 +283,8 @@ function testRun6(arrange, act, assert, callback, module) {
     };
     nodePath = module(".nodePath");
     compiler = callback();
-    run = module(["TruJS.compile._Run", [, nodeFs,, compiler]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs,, compiler, , , , , , , saver]]);
     cmdArgs = {
       "manifest": "/base/path1"
     };
@@ -310,7 +319,7 @@ function testRun6(arrange, act, assert, callback, module) {
 
 /**[@test({ "title": "TruJS.compile._Run: entry command arg " })]*/
 function testRun7(arrange, act, assert, callback, promise, module) {
-  var defaults, manifest, nodeFs, compiler, run, cmdArgs, res;
+  var defaults, manifest, nodeFs, compiler, run, cmdArgs, res, saver;
 
   arrange(function () {
     manifest = "[{ \"name\": \"entry1\" },{ \"name\": \"entry2\" },{ \"name\": \"entry3\" },{ \"name\": \"entry4\" }]";
@@ -322,7 +331,8 @@ function testRun7(arrange, act, assert, callback, promise, module) {
     compiler = callback(function (settings) {
       return promise.resolve(settings);
     });
-    run = module(["TruJS.compile._Run", [, nodeFs, , compiler]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs, , compiler, , , , , , , saver]]);
     cmdArgs = {
       "base": "/base"
       , "manifest": "path1"
@@ -363,7 +373,7 @@ function testRun7(arrange, act, assert, callback, promise, module) {
 
 /**[@test({ "title": "TruJS.compile._Run: object with entries " })]*/
 function testRun7(arrange, act, assert, callback, promise, module) {
-  var defaults, manifest, nodeFs, compiler, run, cmdArgs, res;
+  var defaults, manifest, nodeFs, compiler, run, cmdArgs, res, saver;
 
   arrange(function () {
     manifest = "{ \"name\": \"entry1\", \"entries\": [{ },{ \"name\": \"entry2\" },{ \"name\": \"entry3\" },{ \"name\": \"entry4\" }]}";
@@ -375,7 +385,8 @@ function testRun7(arrange, act, assert, callback, promise, module) {
     compiler = callback(function (basePath, manifest) {
       return promise.resolve(manifest);
     });
-    run = module(["TruJS.compile._Run", [, nodeFs, , compiler]]);
+    saver = callback(function () { return promise.resolve(arguments[0]); });
+    run = module(["TruJS.compile._Run", [, nodeFs, , compiler, , , , , , , saver]]);
     cmdArgs = {
       "base": "/base"
       , "manifest": "path1"
