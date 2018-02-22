@@ -234,7 +234,14 @@ function _Run(promise, nodeFs, nodePath, compiler, defaults, nodeDirName, nodePr
                       }
                   })
                   .catch(function (error) {
-                      reject(error);
+                      running = false;
+                      if (!watch) {
+                          reject(error);
+                      }
+                      else {
+                          compileReporter.report("seperator","");
+                          compileReporter.info("Listening for file changes");
+                      }
                   });
               }
 

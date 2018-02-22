@@ -67,8 +67,8 @@ function _ExtractFileDependencies(promise, errors, annotation, compileReporter) 
                 if (JSON.stringify(moduleEntry) !== JSON.stringify(dependEntry)) {
                     throw new Error(
                         errors.dependConflict
-                        .replace("{key}", "key")
-                        .replace("{path}", "path")
+                        .replace("{key}", key)
+                        .replace("{path}", path)
                     );
                 }
             }

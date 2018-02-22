@@ -63,6 +63,9 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
             resolve(values);
         })
         .catch(function (err) {
+            compileReporter.groupEnd("collect");
+            compileReporter.extended("Collector stopped");
+            compileReporter.groupEnd("collection");
             compileReporter.error(err);
             reject(err);
         });
@@ -179,6 +182,8 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
         resolve(manifestFiles);
       })
       .catch(function (err) {
+        compileReporter.groupEnd("postcollectorrunning");
+        compileReporter.groupEnd("postcollector");
         reject(err);
       });
   }
@@ -239,6 +244,8 @@ function _Compiler(promise, $container, errors, includes, compileReporter, perfo
           resolve(manifestFiles);
         })
         .catch(function (err) {
+          compileReporter.groupEnd("postassemblerrunning");
+          compileReporter.groupEnd("postassembler");
           reject(err);
         });
   }
