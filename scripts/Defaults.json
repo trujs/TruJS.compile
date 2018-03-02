@@ -59,10 +59,10 @@
         "encoding": {
             ".js": "utf8"
             , ".css": "utf8"
+            , ".scss": "utf8"
             , ".html": "utf8"
             , ".json": "utf8"
             , ".txt": "utf8"
-            , ".sass": "utf8"
             , ".xml": "utf8"
         }
     }
@@ -98,6 +98,7 @@
     , "fileTypes": {
         ".html": "Html"
         , ".css": "Css"
+        , ".scss": "Scss"
         , ".json": "Json"
         , ".xml": "Xml"
         , ".txt": "Txt"
