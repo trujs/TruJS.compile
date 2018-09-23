@@ -51,7 +51,7 @@ function _GitRepo(promise, nodeFs, type_collection_gitDriver) {
         proc = proc.then(function () {
             var git = type_collection_gitDriver(basePath + "/" + repoObj.name);
             return new promise(function (resolve, reject) {
-                git.pull(function (err) {
+                git.fetch("--all", function (err) {
                     if (!!err) {
                         reject(err);
                     }
