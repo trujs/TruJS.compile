@@ -20,7 +20,7 @@ function _ExtractFileDependencies(promise, errors, annotation, compileReporter) 
             var newModule = {};
 
             files.forEach(function forEachFile(file) {
-                var depends = extractFileAnnotation(file);
+                var depends = isString(file.data) && extractFileAnnotation(file);
                 if (!!depends) {
                     addModuleEntries(module, newModule, file.path, depends);
                 }

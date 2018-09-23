@@ -23,7 +23,12 @@ function _JavaScriptPreProcessor(promise, annotation, defaults, type_javascript_
     files.forEach(function forEachFile(file, indx) {
 
       procs.push(new promise(function (resolve, reject) {
-        processFile(resolve, reject, entry, file);
+        if (isString(file.data)) {
+            processFile(resolve, reject, entry, file);
+        }
+        else {
+            resolve(file);
+        }
       }));
 
     });
