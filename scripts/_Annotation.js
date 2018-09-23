@@ -137,7 +137,7 @@ function _Annotation(regExGetMatches, regExForEachMatch) {
   * @function
   */
   function clear(text) {
-    return !!text && text.replace(ANNOTATION_PATT, "") || "";
+    return !!text && !!text.replace && text.replace(ANNOTATION_PATT, "") || "";
   }
   /**
   * Extracts the text between annotations of `name`
