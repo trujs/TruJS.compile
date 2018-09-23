@@ -58,11 +58,14 @@
         "encoding": {
             ".js": "utf8"
             , ".css": "utf8"
-            , ".scss": "utf8"
             , ".html": "utf8"
             , ".json": "utf8"
             , ".txt": "utf8"
+            , ".sass": "utf8"
+            , ".scss": "utf8"
             , ".xml": "utf8"
+            , ".svg": "utf8"
+            , ".base64": "utf8"
         }
     }
     , "module": {
@@ -96,10 +99,13 @@
     , "scriptsDir": "scripts"
     , "fileTypes": {
         ".html": "Html"
+        , ".scss":"Scss"
         , ".css": "Css"
-        , ".scss": "Scss"
         , ".json": "Json"
         , ".xml": "Xml"
         , ".txt": "Txt"
+        , ".svg": "Svg"
+        , ".png": "Png"
+        , ".base64": "Base64"
     }
 }
