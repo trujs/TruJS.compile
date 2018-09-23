@@ -19,8 +19,8 @@ function _Namer(annotation, stringTrim, defaults, nodePath) {
   */
   function nameFile(defaultRoot, fileObj, scriptsDir) {
     //get the file data and trim leading and trailing line breaks
-    var data = stringTrim(fileObj.data, "\\r?\\n")
-    , naming = annotation.lookup("naming", data) || {} //get the naming annotation, default empty obj
+    var data = isString(fileObj.data) && stringTrim(fileObj.data, "\\r?\\n")
+    , naming = !!data && annotation.lookup("naming", data) || {} //get the naming annotation, default empty obj
     // get the namespace root starting with the naming annotation, then entry
     , root = !!naming && !!naming.root && naming.root || defaultRoot || "";
 
