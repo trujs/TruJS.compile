@@ -111,6 +111,10 @@ function _FilesSaver(nodeFs, nodePath, promise, errors) {
       , index = 1
       ;
 
+      if (segs[0] === "") {
+          index = 2;
+      }
+
       makeDirectory(segs.slice(0, index).join(sep), makeDirCb);
 
       function makeDirCb(err) {
@@ -135,7 +139,7 @@ function _FilesSaver(nodeFs, nodePath, promise, errors) {
       nodeFs.mkdir(path, function(err) {
         //if there was an error, it could be that the directory exists, ignore those
         if (!!err) {
-          if (err.errno !== cnsts.exists) {
+          if(!!err.message && err.message.indexOf("exists") === -1) {
             cb(err);
             return;
           }
