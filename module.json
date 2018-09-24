@@ -94,7 +94,7 @@
         "javascript": ["TruJS.compile.preProcessor._JavaScriptPreProcessor", []]
         , "module": ["TruJS.compile.preProcessor._ModulePreProcessor", []]
         , "test": ["TruJS.compile.preProcessor._TestPreProcessor", []]
-        , "routing": ["TruJS.compile.preProcessor._RoutingPreprocessor", []]
+        , "routing": ["TruJS.compile.preProcessor._RoutingPreProcessor", []]
         , "view": ["TruJS.compile.preProcessor._ViewPreProcessor", []]
     }]
     , "assembler": [{
